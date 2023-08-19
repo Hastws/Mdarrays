@@ -22,7 +22,7 @@ struct Error : public std::exception {
 #define ERROR_LOCATION __FILE__, __func__, __LINE__
 #define THROW_ERROR(msg)               \
   do {                                 \
-    LOG_ERROR(msg)                     \
+    LOG_MDA_ERROR(msg)                 \
     throw ::KD::Error(ERROR_LOCATION); \
   } while (0)
 

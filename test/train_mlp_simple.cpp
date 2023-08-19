@@ -61,14 +61,14 @@ int main() {
   const KD::BasicData *batch_samples;
   const KD::Index *batch_labels;
   for (KD::Index i = 0; i < epoch; ++i) {
-    LOG_INFO("Epoch " << i << " training...")
-    LOG_INFO("total iterations: " << train_dataset.BatchesSize())
+    LOG_MDA_INFO("Epoch " << i << " training...")
+    LOG_MDA_INFO("total iterations: " << train_dataset.BatchesSize())
     train_dataset.Shuffle();
 
     if (i == lr_decay_epoch) {
       KD::BasicData optimizer_lr = optimizer.Lr();
       optimizer.SetLr(optimizer_lr * lr_decay_factor);
-      LOG_INFO("Lr decay to " << optimizer.Lr())
+      LOG_MDA_INFO("Lr decay to " << optimizer.Lr())
     }
 
     for (KD::Index j = 0; j < train_dataset.BatchesSize(); ++j) {
@@ -85,11 +85,11 @@ int main() {
       optimizer.ZeroGrad();
 
       if (j % print_iterators == 0) {
-        LOG_INFO("iter " << j << " | loss: " << loss.Item())
+        LOG_MDA_INFO("iter " << j << " | loss: " << loss.Item())
       }
     }
 
-    LOG_INFO("Epoch " << i << " Evaluating...")
+    LOG_MDA_INFO("Epoch " << i << " Evaluating...")
     KD::Index total_samples = 0, correct_samples = 0;
     for (KD::Index j = 0; j < val_dataset.BatchesSize(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
@@ -107,15 +107,15 @@ int main() {
         }
       }
     }
-    LOG_INFO("total samples: " << total_samples << " | correct samples: "
-                               << correct_samples << " | acc: ")
-    LOG_INFO(static_cast<KD::BasicData>(correct_samples) / total_samples)
+    LOG_MDA_INFO("total samples: " << total_samples << " | correct samples: "
+                                   << correct_samples << " | acc: ")
+    LOG_MDA_INFO(static_cast<KD::BasicData>(correct_samples) / total_samples)
   }
 
   steady_clock::time_point end_tp = steady_clock::now();
   duration<double> time_span =
       duration_cast<duration<double>>(end_tp - start_tp);
-  LOG_INFO("Training finished. Training took " << time_span.count()
-                                               << " seconds.")
+  LOG_MDA_INFO("Training finished. Training took " << time_span.count()
+                                                   << " seconds.")
   return 0;
 }

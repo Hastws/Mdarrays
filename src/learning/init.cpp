@@ -35,8 +35,7 @@ void KaimingInitializer::Init() const {
   }
 }
 
-UniformInitializer::UniformInitializer(Mdarray &param,
-                                       BasicData a, BasicData b)
+UniformInitializer::UniformInitializer(Mdarray &param, BasicData a, BasicData b)
     : InitializerBase(param), a_(a), b_(b) {}
 
 void UniformInitializer::Init() const {

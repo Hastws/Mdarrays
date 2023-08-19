@@ -8,10 +8,8 @@
 
 namespace KD {
 
-MdarrayImpl::MdarrayImpl(const Storage &storage,
-                                                       const Shape &shape,
-                                                       const IndexArray &stride,
-                                                       bool requires_grad)
+MdarrayImpl::MdarrayImpl(const Storage &storage, const Shape &shape,
+                         const IndexArray &stride, bool requires_grad)
     : storage_(storage),
       shape_(shape),
       stride_(stride),
@@ -22,9 +20,7 @@ MdarrayImpl::MdarrayImpl(const Storage &storage,
   }
 }
 
-MdarrayImpl::MdarrayImpl(Storage storage,
-                                                       Shape shape,
-                                                       bool requires_grad)
+MdarrayImpl::MdarrayImpl(Storage storage, Shape shape, bool requires_grad)
     : storage_(std::move(storage)),
       shape_(std::move(shape)),
       stride_(shape_.DimensionsSize()),
@@ -39,21 +35,15 @@ MdarrayImpl::MdarrayImpl(Storage storage,
   }
 }
 
-MdarrayImpl::MdarrayImpl(const Shape &shape,
-                                                       bool requires_grad)
-    : MdarrayImpl(Storage(shape.SpaceSize()), shape,
-                                 requires_grad) {}
+MdarrayImpl::MdarrayImpl(const Shape &shape, bool requires_grad)
+    : MdarrayImpl(Storage(shape.SpaceSize()), shape, requires_grad) {}
 
-MdarrayImpl::MdarrayImpl(const BasicData *data,
-                                                       const Shape &shape,
-                                                       bool requires_grad)
-    : MdarrayImpl(Storage(data, shape.SpaceSize()), shape,
-                                 requires_grad) {}
+MdarrayImpl::MdarrayImpl(const BasicData *data, const Shape &shape,
+                         bool requires_grad)
+    : MdarrayImpl(Storage(data, shape.SpaceSize()), shape, requires_grad) {}
 
-MdarrayImpl::MdarrayImpl(Storage &&storage,
-                                                       Shape &&shape,
-                                                       IndexArray &&stride,
-                                                       bool requires_grad)
+MdarrayImpl::MdarrayImpl(Storage &&storage, Shape &&shape, IndexArray &&stride,
+                         bool requires_grad)
     : storage_(std::move(storage)),
       shape_(std::move(shape)),
       stride_(std::move(stride)),
@@ -73,8 +63,7 @@ bool MdarrayImpl::IsContiguous() const {
   return true;
 }
 
-BasicData &MdarrayImpl::operator[](
-    std::initializer_list<Index> indexes) {
+BasicData &MdarrayImpl::operator[](std::initializer_list<Index> indexes) {
   CHECK_EQUAL(DimensionsSize(), indexes.size(),
               "Invalid " << indexes.size() << " indices for "
                          << DimensionsSize() << " multidimensional_arrays");
@@ -90,8 +79,7 @@ BasicData &MdarrayImpl::operator[](
   return storage_[offset];
 }
 
-BasicData MdarrayImpl::operator[](
-    std::initializer_list<Index> indexes) const {
+BasicData MdarrayImpl::operator[](std::initializer_list<Index> indexes) const {
   CHECK_EQUAL(DimensionsSize(), indexes.size(),
               "Invalid " << indexes.size() << " indices for "
                          << DimensionsSize() << " multidimensional_arrays");
@@ -113,8 +101,8 @@ BasicData MdarrayImpl::Item() const {
   return storage_[0];
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::Slice(Index dim, Index idx) const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Slice(Index dim,
+                                                     Index idx) const {
   CHECK_IN_RANGE(dim, 0, DimensionsSize(),
                  "Dimension out of range (expected to be in range of [0, "
                      << DimensionsSize() << "), but got " << dim << ")");
@@ -150,9 +138,8 @@ MdarrayImpl::Slice(Index dim, Index idx) const {
   return ret_ptr;
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::Slice(Index dim, Index start_idx,
-                                  Index end_idx) const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Slice(Index dim, Index start_idx,
+                                                     Index end_idx) const {
   CHECK_IN_RANGE(dim, 0, DimensionsSize(),
                  "Dimension out of range (expected to be in range of [0, "
                      << DimensionsSize() << "), but got " << dim << ")");
@@ -184,8 +171,8 @@ MdarrayImpl::Slice(Index dim, Index start_idx,
   return ret_ptr;
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::Transpose(Index dim1, Index dim2) const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Transpose(Index dim1,
+                                                         Index dim2) const {
   CHECK_IN_RANGE(dim1, 0, DimensionsSize(),
                  "Dimension out of range (expected to be in range of [0, "
                      << DimensionsSize() << "), but got " << dim1 << ")");
@@ -215,8 +202,8 @@ MdarrayImpl::Transpose(Index dim1, Index dim2) const {
   return ret_ptr;
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::Permute(std::initializer_list<Index> dims) const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Permute(
+    std::initializer_list<Index> dims) const {
   CHECK_EQUAL(dims.size(), DimensionsSize(),
               "Dimension not match (expected dims of "
                   << DimensionsSize() << ", but got " << dims.size() << ")");
@@ -241,8 +228,7 @@ MdarrayImpl::Permute(std::initializer_list<Index> dims) const {
   return ret_ptr;
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::View(const Shape &shape) const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::View(const Shape &shape) const {
   CHECK_TRUE(IsContiguous(),
              "View() is only supported to contiguous multidimensional_arrays");
   CHECK_EQUAL(shape.SpaceSize(), shape_.SpaceSize(),
@@ -252,8 +238,8 @@ MdarrayImpl::View(const Shape &shape) const {
                   << shape_.SpaceSize());
   // new_data_ptr = data_ptr
   // Just use new shape and adjust Stride.
-  auto ret_ptr = Allocator::UniqueConstruct<MdarrayImpl>(
-      storage_, shape, false);
+  auto ret_ptr =
+      Allocator::UniqueConstruct<MdarrayImpl>(storage_, shape, false);
   if (requires_grad_) {
     ret_ptr->requires_grad_ = true;
     ret_ptr->grad_meta_ptr_ =
@@ -264,8 +250,7 @@ MdarrayImpl::View(const Shape &shape) const {
   return ret_ptr;
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::Squeeze() const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Squeeze() const {
   Index count = 0;
   auto squeeze_dims_ptr =
       Allocator::UniqueAllocate<Index>(DimensionsSize() * sizeof(Index));
@@ -277,8 +262,7 @@ MdarrayImpl::Squeeze() const {
   return View(squeeze_shape);
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::Unsqueeze(Index dim) const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Unsqueeze(Index dim) const {
   Index new_dim_size = DimensionsSize() + 1;
   CHECK_IN_RANGE(dim, 0, new_dim_size,
                  "Dimension out of range (expected to be in range of [0, "
@@ -299,11 +283,10 @@ MdarrayImpl::Unsqueeze(Index dim) const {
   return View(Shape(unsqueeze_dims, new_dim_size));
 }
 
-Allocator::UniquePtr<MdarrayImpl>
-MdarrayImpl::Grad() const {
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Grad() const {
   CHECK_TRUE(requires_grad_, "The multidimensional_arrays don't require Grad.");
-  return Allocator::UniqueConstruct<MdarrayImpl>(
-      grad_meta_ptr_->grad_, shape_, stride_, false);
+  return Allocator::UniqueConstruct<MdarrayImpl>(grad_meta_ptr_->grad_, shape_,
+                                                 stride_, false);
 }
 
 BasicData MdarrayImpl::Eval(IndexArray &indexes) const {
@@ -314,8 +297,6 @@ BasicData MdarrayImpl::Eval(IndexArray &indexes) const {
   return storage_[offset];
 }
 
-BasicData MdarrayImpl::Eval(Index idx) const {
-  return storage_[idx];
-}
+BasicData MdarrayImpl::Eval(Index idx) const { return storage_[idx]; }
 
 }  // namespace KD

@@ -1,7 +1,7 @@
 #ifndef MULTIDIMENSIONAL_ARRAYS_INCLUDE_MDARRAY_MDARRAY_H
 #define MULTIDIMENSIONAL_ARRAYS_INCLUDE_MDARRAY_MDARRAY_H
 
-#include  <initializer_list>
+#include <initializer_list>
 #include <memory>
 
 #include "exp/exp.h"

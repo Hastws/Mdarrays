@@ -30,8 +30,7 @@ ParamsDict Linear::Parameters() {
 LinearWithReLU::LinearWithReLU(Index in_features, Index out_features)
     : Linear(in_features, out_features) {}
 
-Mdarray LinearWithReLU::Forward(
-    const Mdarray &x) {
+Mdarray LinearWithReLU::Forward(const Mdarray &x) {
   Mdarray y1 = Operator::CreateOperationMatrixMul(
       x, Operator::CreateOperationMatrixTranspose(weight_));
   Mdarray y2 = Operator::CreateOperationRelu(y1 + bias_);
@@ -61,8 +60,7 @@ Mdarray Conv2d::Forward(const Mdarray &x) {
       Operator::CreateOperationImgToCol(x, kernel_size_, stride_, padding_);
 
   Mdarray y1 = Operator::CreateOperationMatrixMul(
-      Mdarray(col_exp),
-      Operator::CreateOperationMatrixTranspose(weight_));
+      Mdarray(col_exp), Operator::CreateOperationMatrixTranspose(weight_));
 
   auto &&conv_feat_size = col_exp.Impl().ConvFeatSize();
   Mdarray y2 = y1.View(
@@ -79,15 +77,12 @@ Conv2dWithReLU::Conv2dWithReLU(Index in_channels, Index out_channels,
                                const MatrixSize &padding)
     : Conv2d(in_channels, out_channels, kernel_size, stride, padding) {}
 
-Mdarray Conv2dWithReLU::Forward(
-    const Mdarray &x) {
+Mdarray Conv2dWithReLU::Forward(const Mdarray &x) {
   auto col_exp =
       Operator::CreateOperationImgToCol(x, kernel_size_, stride_, padding_);
 
-  Mdarray y1 =
-      Operator::CreateOperationRelu(Operator::CreateOperationMatrixMul(
-          Mdarray(col_exp),
-          Operator::CreateOperationMatrixTranspose(weight_)));
+  Mdarray y1 = Operator::CreateOperationRelu(Operator::CreateOperationMatrixMul(
+      Mdarray(col_exp), Operator::CreateOperationMatrixTranspose(weight_)));
 
   auto &conv_feat_size = col_exp.Impl().ConvFeatSize();
   Mdarray y2 = y1.View(
@@ -113,9 +108,8 @@ Mdarray MaxPool2d::Forward(const Mdarray &x) {
   Mdarray y1 = col_exp;
 
   auto &conv_feat_size = col_exp.Impl().ConvFeatSize();
-  Mdarray y2 =
-      y1.View({conv_feat_size.first, conv_feat_size.second, x.Size(0),
-               x.Size(1), kernel_size_.first * kernel_size_.second});
+  Mdarray y2 = y1.View({conv_feat_size.first, conv_feat_size.second, x.Size(0),
+                        x.Size(1), kernel_size_.first * kernel_size_.second});
   Mdarray y3 = Operator::CreateOperationMax(y2, 4);
   Mdarray y4 = y3.Permute({2, 3, 0, 1});
   return y4;
@@ -123,8 +117,7 @@ Mdarray MaxPool2d::Forward(const Mdarray &x) {
 
 ParamsDict MaxPool2d::Parameters() { return {}; }
 
-Mdarray CrossEntropy::Forward(
-    const Mdarray &input, const Index *labels) {
+Mdarray CrossEntropy::Forward(const Mdarray &input, const Index *labels) {
   auto log_its = Operator::CreateOperationLogSoftmax(input);
   auto nll = Operator::CreateOperationNllLoss(log_its, labels);
   Mdarray loss = Operator::CreateOperationMean(nll, 0);

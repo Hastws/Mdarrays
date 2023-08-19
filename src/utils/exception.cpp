@@ -8,7 +8,7 @@ namespace KD {
 char Error::msg_[1024] = {0};
 
 Error::Error(const char *file, const char *func, unsigned int line)
-    : file_(file), func_(func), line_(line){}
+    : file_(file), func_(func), line_(line) {}
 
 const char *Error::what() const noexcept {
   std::stringstream s;

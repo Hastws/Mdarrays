@@ -67,7 +67,7 @@ int main() {
   std::chrono::duration<double> time_span =
       std::chrono::duration_cast<std::chrono::duration<double>>(end_tp -
                                                                 start_tp);
-  LOG_INFO("Test success, test took :[" << time_span.count() << "]s.")
+  LOG_MDA_INFO("Test success, test took :[" << time_span.count() << "]s.")
 
   return 0;
 }
@@ -85,7 +85,7 @@ void TestMdarray() {
   // [[1, 2, 3, 4],
   // [5, 6, 7, 8],
   // [9, 10, 11, 12]]
-  LOG_INFO(mda_1)
+  LOG_MDA_INFO(mda_1)
 
   auto mda_2 = mda_1.Transpose(0, 1);
   for (KD::Index i = 0; i < 4; ++i) {
@@ -99,7 +99,7 @@ void TestMdarray() {
   // [2, 6, 10],
   // [3, 7, 11],
   // [4, 8, 12]]
-  LOG_INFO(mda_2)
+  LOG_MDA_INFO(mda_2)
 
   auto mda_3 = mda_2.Slice(1, 1, 3);
   auto shape_t3 = mda_3.Size();
@@ -116,7 +116,7 @@ void TestMdarray() {
   // [6, 10],
   // [7, 11],
   // [8, 12]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   auto mda_4 = mda_1.View({3, 2, 2});
   auto shape_t4 = mda_4.Size();
@@ -135,7 +135,7 @@ void TestMdarray() {
   // [7, 8]],
   // [[9, 10],
   // [11, 12]]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
 
   auto mda_5 = mda_4.Unsqueeze(0).Unsqueeze(2);
   CHECK_EQUAL(mda_5.DimensionsSize(), 5, "Check unsqueeze.");
@@ -156,7 +156,7 @@ void TestMdarray() {
   // [[[5, 6],[7, 8]]],
   // [[[9, 10],[11, 12]]]
   // ]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
 
   auto mda_6 = mda_5.Squeeze();
   CHECK_EQUAL(mda_6.DimensionsSize(), mda_4.DimensionsSize(), "Check squeeze.");
@@ -172,7 +172,7 @@ void TestMdarray() {
   // [[[1, 2],[3, 4]],
   // [[5, 6],[7, 8]],
   // [[9, 10],[11, 12]]]
-  LOG_INFO(mda_6)
+  LOG_MDA_INFO(mda_6)
 
   auto mda_7 = mda_5.Permute({0, 2, 3, 4, 1});
   CHECK_EQUAL(mda_7.DimensionsSize(), 5, "Check permute.");
@@ -194,7 +194,7 @@ void TestMdarray() {
   // [[3, 7, 11],[4, 8, 12]]
   // ]
   // ]]
-  LOG_INFO(mda_7)
+  LOG_MDA_INFO(mda_7)
 }
 
 void TestBasicOperator() {
@@ -219,15 +219,15 @@ void TestBasicOperator() {
   // [[1, 2, 3, 4],
   // [5, 6, 7, 8],
   // [9, 10, 11, 12]]
-  LOG_INFO(mda_1)
+  LOG_MDA_INFO(mda_1)
   // [[1, 2, 3, 4],
   // [5, 6, 7, 8],
   // [9, 10, 11, 12]]
-  LOG_INFO(mda_2)
+  LOG_MDA_INFO(mda_2)
   // [[2, 4, 6, 8],
   // [10, 12, 14, 16],
   // [18, 20, 22, 24]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   mda_3 += mda_1;
   for (KD::Index i = 0; i < 3; ++i) {
@@ -240,7 +240,7 @@ void TestBasicOperator() {
   // [[3, 6, 9, 12],
   // [15, 18, 21, 24],
   // [27, 30, 33, 36]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   KD::Mdarray mda_4 = mda_1 * mda_2 + mda_3;
   for (KD::Index i = 0; i < 3; ++i) {
@@ -253,7 +253,7 @@ void TestBasicOperator() {
   // [[4, 10, 18, 28],
   // [40, 54, 70, 88],
   // [108, 130, 154, 180]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
 
   auto func = [&mda_1, &mda_2](const KD::Mdarray &t3, const KD::Mdarray &t4) {
     auto add_exp = mda_1 + mda_2;
@@ -277,7 +277,7 @@ void TestBasicOperator() {
   // [[11, 60, 165, 344],
   // [615, 996, 1505, 2160],
   // [2979, 3980, 5181, 6600]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
 
   KD::Mdarray mda_6 = mda_1.View({2, 1, 1, 2, 3});
   KD::Mdarray mda_7 = mda_1.View({2, 2, 1, 1, 3});
@@ -285,17 +285,17 @@ void TestBasicOperator() {
   KD::Mdarray mda_8 = mda_1.View({2, 2, 3});
   // [[[[[1, 2, 3],[4, 5, 6]]]],
   // [[[[7, 8, 9],[10, 11, 12]]]]]
-  LOG_INFO(mda_6)
+  LOG_MDA_INFO(mda_6)
   // [
   // [[[[1, 2, 3]]],[[[4, 5, 6]]]],
   // [[[[7, 8, 9]]],[[[10, 11, 12]]]]
   // ]
-  LOG_INFO(mda_7)
+  LOG_MDA_INFO(mda_7)
   // [
   // [[1, 2, 3],[4, 5, 6]],
   // [[7, 8, 9],[10, 11, 12]]
   // ]
-  LOG_INFO(mda_8)
+  LOG_MDA_INFO(mda_8)
   auto exp1 = mda_6 + mda_7;
   auto exp2 = -(mda_6 * mda_8);
   auto exp3 = mda_6 - mda_8;
@@ -318,7 +318,7 @@ void TestBasicOperator() {
   }
 
   // (2, 2, 3, 2, 3)
-  LOG_INFO(mda_9.Size())
+  LOG_MDA_INFO(mda_9.Size())
   // [
   // [
   // [[[1, 3, 5],[4, 6, 8]],[[-1, 0, 1],[-1, 0, 1]],[[-3, -3, -3],[-6, -6,
@@ -333,7 +333,7 @@ void TestBasicOperator() {
   // -107]],[[-72, -81, -90],[-102, -111, -120]]]
   // ]
   // ]
-  LOG_INFO(mda_9)
+  LOG_MDA_INFO(mda_9)
 
   KD::Mdarray mda_10 =
       mda_1.Transpose(0, 1) + KD::Operator::CreateOperationConstant(1, {4, 3});
@@ -348,7 +348,7 @@ void TestBasicOperator() {
   // [3, 7, 11],
   // [4, 8, 12],
   // [5, 9, 13]]
-  LOG_INFO(mda_10)
+  LOG_MDA_INFO(mda_10)
 
   // assignment of uncontiguous multidimensional_arrays
   auto mda_11 = mda_1.Transpose(0, 1);
@@ -369,17 +369,17 @@ void TestBasicOperator() {
   // [4, 5, 6],
   // [7, 8, 9],
   // [10, 11, 12]]
-  LOG_INFO(mda_11)
+  LOG_MDA_INFO(mda_11)
   // [[1, 2, 3],
   // [4, 5, 6],
   // [7, 8, 9],
   // [10, 11, 12]]
-  LOG_INFO(mda_12)
+  LOG_MDA_INFO(mda_12)
   // [[1, 2, 3],
   // [4, 5, 6],
   // [7, 8, 9],
   // [10, 11, 12]]
-  LOG_INFO(mda_13)
+  LOG_MDA_INFO(mda_13)
 }
 
 void TestMatrixOperator() {
@@ -388,9 +388,9 @@ void TestMatrixOperator() {
   KD::Mdarray mda_1(data_1, KD::Shape{2, 6});
   KD::Mdarray mda_2(data_2, KD::Shape{2, 6});
   // [[1, 2, 3, 4, 5, 6],[7, 8, 9, 10, 11, 12]]
-  LOG_INFO(mda_1)
+  LOG_MDA_INFO(mda_1)
   //[[11, 21, 31, 41, 51, 61],[71, 81, 91, 101, 111, 121]]
-  LOG_INFO(mda_2)
+  LOG_MDA_INFO(mda_2)
 
   KD::Mdarray mda_3 = KD::Operator::CreateOperationMatrixTranspose(
       KD::Operator::CreateOperationMatrixMul(mda_1, mda_2.Transpose(0, 1)));
@@ -403,14 +403,14 @@ void TestMatrixOperator() {
     }
   }
   // [[931, 2227],[2191, 5647]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   KD::Mdarray mda_4 = mda_1.View({3, 2, 2});
   KD::Mdarray mda_5 = mda_2.View({3, 2, 2});
   // [[[1, 2],[3, 4]],[[5, 6],[7, 8]],[[9, 10],[11, 12]]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
   // [[[11, 21],[31, 41]],[[51, 61],[71, 81]],[[91, 101],[111, 121]]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
   KD::Mdarray mda_6 = KD::Operator::CreateOperationBatchMatrixTranspose(
       KD::Operator::CreateOperationBatchMatrixMul(mda_4, mda_5));
   KD::BasicData t6_expect[3][2][2] = {{{73, 157}, {103, 227}},
@@ -427,7 +427,7 @@ void TestMatrixOperator() {
   }
   // [[[73, 157],[103, 227]],[[681, 925],[791, 1075]],[[1929, 2333],[2119,
   // 2563]]]
-  LOG_INFO(mda_6)
+  LOG_MDA_INFO(mda_6)
 
   KD::Mdarray mda_7 = KD::Operator::CreateOperationMatrixTranspose(mda_1);
   CHECK_EQUAL(mda_7.DimensionsSize(), 2, "check3");
@@ -441,11 +441,11 @@ void TestMatrixOperator() {
     }
   }
   // [[1, 7],[2, 8],[3, 9],[4, 10],[5, 11],[6, 12]]
-  LOG_INFO(mda_7)
+  LOG_MDA_INFO(mda_7)
 
   KD::Mdarray mda_8(data_1, KD::Shape{2, 2, 3});
   // [[[1, 2, 3],[4, 5, 6]],[[7, 8, 9],[10, 11, 12]]]
-  LOG_INFO(mda_8)
+  LOG_MDA_INFO(mda_8)
 
   KD::Mdarray mda_9 = KD::Operator::CreateOperationBatchMatrixTranspose(mda_8);
   CHECK_EQUAL(mda_9.DimensionsSize(), 3, "check4");
@@ -462,7 +462,7 @@ void TestMatrixOperator() {
     }
   }
   // [[[1, 4],[2, 5],[3, 6]],[[7, 10],[8, 11],[9, 12]]]
-  LOG_INFO(mda_9)
+  LOG_MDA_INFO(mda_9)
 }
 
 void TestNumericOperator() {
@@ -473,7 +473,7 @@ void TestNumericOperator() {
   // [[0.585639, 0.612628, 0.241485, 0.097616],
   // [0.035854, 0.723054, 0.131163, 0.884268],
   // [0.193597, 0.694748, 0.650687, 0.738797]]
-  LOG_INFO(mda_1)
+  LOG_MDA_INFO(mda_1)
   KD::BasicData t1_expect[3][4] = {
       {-1.208965, -1.181976, -1.553119, -1.696988},
       {-1.860054, -1.172853, -1.764744, -1.011639},
@@ -492,7 +492,7 @@ void TestNumericOperator() {
   // -1.01163923576525],
   // [-1.78423866041312, -1.28308766041312, -1.32714866041312,
   // -1.23903866041312]]
-  LOG_INFO(mda_2)
+  LOG_MDA_INFO(mda_2)
 
   auto labels_ptr =
       KD::Allocator::SharedAllocate<KD::Index>(3 * sizeof(KD::Index));
@@ -506,7 +506,7 @@ void TestNumericOperator() {
   CHECK_FLOAT_EQUAL(mda_3[{1}], -t1_expect[1][0], "check2");
   CHECK_FLOAT_EQUAL(mda_3[{2}], -t1_expect[2][3], "check2");
   // [1.55311882874321, 1.86005323576525, 1.23903866041312]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   KD::BasicData data_2[] = {0.096237, -0.037000, 0.028076, 0.328307,
                             0.122271, -0.017293, 0.150791, 0.421008,
@@ -514,7 +514,7 @@ void TestNumericOperator() {
   KD::Mdarray mda_4(data_2, KD::Shape{2, 2, 3});
   // [[[0.096237, -0.037, 0.028076],[0.328307, 0.122271, -0.017293]],[[0.150791,
   // 0.421008, 0.322066],[-0.321352, 0.319534, -0.424081]]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
 
   KD::Mdarray mda_5 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationSigmoid(
@@ -535,14 +535,14 @@ void TestNumericOperator() {
   // [[0.552694042632973, 0.515264862011877,
   // 0.503509269484445],[0.518813240662988, 0.591467555207441,
   // 0.539913834749743]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
 
   KD::Mdarray mda_6 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationMean(mda_5, 0), 0);
   CHECK_TRUE(mda_6.DimensionsSize() == 1 && mda_6.Size(0) == 1, "check5");
   CHECK_FLOAT_EQUAL(mda_6.Item(), 0.536944, "check5");
   // [0.536943800791578]
-  LOG_INFO(mda_6)
+  LOG_MDA_INFO(mda_6)
 
   KD::Mdarray mda_7 = KD::Operator::CreateOperationArgmax(mda_4, 1);
   KD::Index t6_expect[][3] = {{1, 1, 0}, {0, 0, 0}};
@@ -554,7 +554,7 @@ void TestNumericOperator() {
     }
   }
   // [[1, 1, 0],[0, 0, 0]]
-  LOG_INFO(mda_7)
+  LOG_MDA_INFO(mda_7)
 
   KD::Mdarray mda_8 = KD::Operator::CreateOperationMax(mda_4, 1);
   for (KD::Index i = 0; i < 2; ++i) {
@@ -565,7 +565,7 @@ void TestNumericOperator() {
     }
   }
   // [[0.328307, 0.122271, 0.028076],[0.150791, 0.421008, 0.322066]]
-  LOG_INFO(mda_8)
+  LOG_MDA_INFO(mda_8)
 }
 
 void TestConvOperator() {
@@ -581,7 +581,7 @@ void TestConvOperator() {
   // [0.2132, 0.0185, 0.0163, 0.9874],
   // [0.2039, 0.802, 0.3766, 0.6537],
   // [0.8543, 0.3589, 0.5178, 0.7816]]]]
-  LOG_INFO(dma_0)
+  LOG_MDA_INFO(dma_0)
 
   KD::Mdarray dma_1 =
       KD::Operator::CreateOperationMaxPool2d(dma_0, {2, 2}, {1, 1}, {1, 1});
@@ -610,7 +610,7 @@ void TestConvOperator() {
   // [0.2132, 0.802, 0.802, 0.9874, 0.9874],
   // [0.8543, 0.8543, 0.802, 0.7816, 0.7816],
   // [0.8543, 0.8543, 0.5178, 0.7816, 0.7816]]]]
-  LOG_INFO(dma_1)
+  LOG_MDA_INFO(dma_1)
 
   KD::Mdarray dma_2 =
       KD::Operator::CreateOperationMaxPool2d(dma_1, {3, 4}, {2, 3}, {0, 1});
@@ -628,7 +628,7 @@ void TestConvOperator() {
     }
   }
   // [[[[0.964, 0.9457],[0.964, 0.9874],[0.8543, 0.9874]]]]
-  LOG_INFO(dma_2)
+  LOG_MDA_INFO(dma_2)
 
   KD::Mdarray mda_3 =
       KD::Operator::CreateOperationImgToCol(dma_0, {4, 4}, {2, 2}, {1, 1});
@@ -664,7 +664,7 @@ void TestConvOperator() {
   // 0, 0.2039, 0.802, 0.3766, 0, 0.8543, 0.3589, 0.5178, 0, 0, 0, 0], [0.0185,
   // 0.0163, 0.9874, 0, 0.802, 0.3766, 0.6537, 0, 0.3589, 0.5178, 0.7816, 0, 0,
   // 0, 0, 0]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   KD::BasicData t4_data[2][3][6][4];
   for (KD::Index i = 0; i < 2; ++i) {
@@ -714,7 +714,7 @@ void TestConvOperator() {
   // [0.2132, 0.0185, 0.0163, 0.9874],
   // [0.2039, 0.802, 0.3766, 0.6537],
   // [0.8543, 0.3589, 0.5178, 0.7816]]]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
 
   KD::Mdarray mda_5 =
       KD::Operator::CreateOperationImgToCol(mda_4, {2, 3}, {1, 2}, {2, 1});
@@ -799,26 +799,26 @@ void TestConvOperator() {
   // 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
 }
 
 void TestMdarrayBackward() {
   KD::BasicData data_1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
   KD::Mdarray mda_1(data_1, KD::Shape{3, 4}, true);
   // [[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12]]
-  LOG_INFO(mda_1)
+  LOG_MDA_INFO(mda_1)
 
   KD::Mdarray mda_2 = mda_1.View({2, 2, 3});
   // [[[1, 2, 3],[4, 5, 6]],[[7, 8, 9],[10, 11, 12]]]
-  LOG_INFO(mda_2)
+  LOG_MDA_INFO(mda_2)
 
   KD::Mdarray mda_3 = mda_2.Slice(2, 1, 3);
   // [[[2, 3],[5, 6]],[[8, 9],[11, 12]]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   KD::Mdarray mda_4 = mda_3.Slice(1, 1);
   // [[5, 6],[11, 12]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
 
   mda_4.Backward();
   KD::BasicData t0_grad_expect_1[][4] = {
@@ -832,23 +832,23 @@ void TestMdarrayBackward() {
     }
   }
   // [[0, 0, 0, 0],[1, 1, 0, 0],[0, 0, 1, 1]]
-  LOG_INFO(grad_1)
+  LOG_MDA_INFO(grad_1)
 
   KD::Mdarray mda_5 = mda_1.View({3, 2, 2});
   // [[[1, 2],[3, 4]],[[5, 6],[7, 8]],[[9, 10],[11, 12]]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
 
   KD::Mdarray mda_6 = mda_5.Transpose(0, 1);
   // [[[1, 2],[5, 6],[9, 10]],[[3, 4],[7, 8],[11, 12]]]
-  LOG_INFO(mda_6)
+  LOG_MDA_INFO(mda_6)
 
   KD::Mdarray mda_7 = mda_6.Slice(0, 0, 1);
   // [[[1, 2],[5, 6],[9, 10]]]
-  LOG_INFO(mda_7)
+  LOG_MDA_INFO(mda_7)
 
   KD::Mdarray mda_8 = mda_7.Permute({1, 2, 0});
   // [[[1],[2]],[[5],[6]],[[9],[10]]]
-  LOG_INFO(mda_8)
+  LOG_MDA_INFO(mda_8)
 
   mda_8.Backward();
   KD::BasicData t0_grad_expect_2[][4] = {
@@ -863,7 +863,7 @@ void TestMdarrayBackward() {
   }
   // twice grad result.
   // [[1, 1, 0, 0],[2, 2, 0, 0],[1, 1, 1, 1]]
-  LOG_INFO(grad_2)
+  LOG_MDA_INFO(grad_2)
 }
 
 void TestBasicOperatorBackward() {
@@ -871,23 +871,23 @@ void TestBasicOperatorBackward() {
   KD::Mdarray mda_1(data, KD::Shape{3, 4}, true);
   KD::Mdarray mda_2(data, KD::Shape{3, 4}, true);
   // [[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12]]
-  LOG_INFO(mda_1)
+  LOG_MDA_INFO(mda_1)
 
   // [[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12]]
-  LOG_INFO(mda_2)
+  LOG_MDA_INFO(mda_2)
 
   KD::Mdarray mda_3 = mda_1 + mda_2;
   KD::Mdarray mda_4 = mda_1 * (-mda_3);
   KD::Mdarray mda_5 = mda_4 - mda_3;
   mda_5.Backward();
   // [[2, 4, 6, 8],[10, 12, 14, 16],[18, 20, 22, 24]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   // [[-2, -8, -18, -32],[-50, -72, -98, -128],[-162, -200, -242, -288]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
 
   // [[-4, -12, -24, -40],[-60, -84, -112, -144],[-180, -220, -264, -312]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
 
   KD::BasicData mda_1_grad_expect[][4] = {
       {-4, -7, -10, -13}, {-16, -19, -22, -25}, {-28, -31, -34, -37}};
@@ -906,10 +906,10 @@ void TestBasicOperatorBackward() {
     }
   }
   // [[-4, -7, -10, -13],[-16, -19, -22, -25],[-28, -31, -34, -37]]
-  LOG_INFO(mda_1_grad)
+  LOG_MDA_INFO(mda_1_grad)
 
   // [[-2, -3, -4, -5],[-6, -7, -8, -9],[-10, -11, -12, -13]]
-  LOG_INFO(mda_2_grad)
+  LOG_MDA_INFO(mda_2_grad)
 }
 
 void TestMatrixOperatorBackward() {
@@ -918,15 +918,15 @@ void TestMatrixOperatorBackward() {
   KD::Mdarray mda_1(data_1, KD::Shape{2, 6}, true);
   KD::Mdarray mda_2(data_2, KD::Shape{2, 6}, true);
   // [[1, 2, 3, 4, 5, 6],[7, 8, 9, 10, 11, 12]]
-  LOG_INFO(mda_1)
+  LOG_MDA_INFO(mda_1)
 
   // [[11, 21, 31, 41, 51, 61],[71, 81, 91, 101, 111, 121]]
-  LOG_INFO(mda_2)
+  LOG_MDA_INFO(mda_2)
 
   KD::Mdarray mda_3 =
       KD::Operator::CreateOperationMatrixMul(mda_1, mda_2.Transpose(0, 1));
   // [[931, 2191],[2227, 5647]]
-  LOG_INFO(mda_3)
+  LOG_MDA_INFO(mda_3)
 
   mda_3.Backward();
   KD::Mdarray mda_4 = mda_1.View({3, 2, 2});
@@ -934,14 +934,14 @@ void TestMatrixOperatorBackward() {
   KD::Mdarray mda_6 = KD::Operator::CreateOperationBatchMatrixMul(mda_4, mda_5);
   mda_6.Backward();
   // [[[1, 2],[3, 4]],[[5, 6],[7, 8]],[[9, 10],[11, 12]]]
-  LOG_INFO(mda_4)
+  LOG_MDA_INFO(mda_4)
 
   // [[[11, 21],[31, 41]],[[51, 61],[71, 81]],[[91, 101],[111, 121]]]
-  LOG_INFO(mda_5)
+  LOG_MDA_INFO(mda_5)
 
   // [[[73, 103],[157, 227]],[[681, 791],[925, 1075]],[[1929, 2119],[2333,
   // 2563]]]
-  LOG_INFO(mda_6)
+  LOG_MDA_INFO(mda_6)
 
   auto &&t1_grad = mda_1.Grad();
   auto &&t2_grad = mda_2.Grad();
@@ -953,10 +953,10 @@ void TestMatrixOperatorBackward() {
     }
   }
   // [[114, 174, 154, 214, 274, 334],[194, 254, 314, 374, 354, 414]]
-  LOG_INFO(t1_grad)
+  LOG_MDA_INFO(t1_grad)
 
   // [[12, 14, 18, 20, 28, 30],[22, 24, 32, 34, 38, 40]]
-  LOG_INFO(t2_grad)
+  LOG_MDA_INFO(t2_grad)
 }
 
 void TestNumericOperatorBackward() {
@@ -966,7 +966,7 @@ void TestNumericOperatorBackward() {
   KD::Mdarray dma_1(data_1, KD::Shape{3, 4}, true);
   // [[0.585639, 0.612628, 0.241485, 0.097616],[0.035854, 0.723054, 0.131163,
   // 0.884268],[0.193597, 0.694748, 0.650687, 0.738797]]
-  LOG_INFO(dma_1)
+  LOG_MDA_INFO(dma_1)
 
   KD::Mdarray dma_2 = KD::Operator::CreateOperationLogSoftmax(dma_1);
   // [[-1.20896482874321, -1.18197582874321, -1.55311882874321,
@@ -975,7 +975,7 @@ void TestNumericOperatorBackward() {
   // -1.01163923576525],
   // [-1.78423866041312, -1.28308766041312, -1.32714866041312,
   // -1.23903866041312]]
-  LOG_INFO(dma_2)
+  LOG_MDA_INFO(dma_2)
 
   auto labels_ptr =
       KD::Allocator::SharedAllocate<KD::Index>(3 * sizeof(KD::Index));
@@ -983,7 +983,7 @@ void TestNumericOperatorBackward() {
   labels[0] = 2, labels[1] = 0, labels[2] = 3;
   KD::Mdarray dma_3 = KD::Operator::CreateOperationNllLoss(dma_2, labels_ptr);
   // [1.55311882874321, 1.86005323576525, 1.23903866041312]
-  LOG_INFO(dma_3)
+  LOG_MDA_INFO(dma_3)
 
   dma_3.Backward();
   KD::BasicData dma_1_grad_expect[][4] = {{0.2985, 0.3067, -0.7884, 0.1832},
@@ -1002,7 +1002,7 @@ void TestNumericOperatorBackward() {
   // [-0.84433565676302, 0.309482653349183, 0.171230575541985,
   // 0.363622427871852], [0.167924860188404, 0.277180139678897,
   // 0.26523245192561, -0.710337451792911]]
-  LOG_INFO(dma_1_grad)
+  LOG_MDA_INFO(dma_1_grad)
 
   KD::BasicData data_2[] = {0.096237, -0.037000, 0.028076, 0.328307,
                             0.122271, -0.017293, 0.150791, 0.421008,
@@ -1015,13 +1015,13 @@ void TestNumericOperatorBackward() {
   KD::Mdarray dma_6 = KD::Operator::CreateOperationMax(dma_5, 1);
   // [[[0.096237, -0.037, 0.028076],[0.328307, 0.122271, -0.017293]],[[0.150791,
   // 0.421008, 0.322066],[-0.321352, 0.319534, -0.424081]]]
-  LOG_INFO(dma_4)
+  LOG_MDA_INFO(dma_4)
   // [[0.552694042632973, 0.515264862011877,
   // 0.503509269484445],[0.518813240662988, 0.591467555207441,
   // 0.539913834749743]]
-  LOG_INFO(dma_5)
+  LOG_MDA_INFO(dma_5)
   // [0.552694042632973, 0.591467555207441]
-  LOG_INFO(dma_6)
+  LOG_MDA_INFO(dma_6)
 
   dma_6.Backward();
   KD::BasicData dma_2_grad_expect[][2][3] = {
@@ -1039,7 +1039,7 @@ void TestNumericOperatorBackward() {
   }
   // [[[0.124711022411849, 0, 0],[0.12169130131953, 0, 0]],[[0,
   // 0.119620621286394, 0],[0, 0.121862834072581, 0]]]
-  LOG_INFO(dma_2_grad)
+  LOG_MDA_INFO(dma_2_grad)
 }
 
 void TestImg2colOperatorBackward() {
@@ -1057,7 +1057,7 @@ void TestImg2colOperatorBackward() {
   // [0.2039, 0.802, 0.3766, 0.6537],
   // [0.8543, 0.3589, 0.5178, 0.7816]
   // ]]]
-  LOG_INFO(dma_1)
+  LOG_MDA_INFO(dma_1)
 
   KD::Mdarray dma_2 =
       KD::Operator::CreateOperationImgToCol(dma_1, {5, 3}, {1, 1}, {0, 0});
@@ -1069,11 +1069,11 @@ void TestImg2colOperatorBackward() {
   // 0.2132, 0.0185, 0.0163, 0.2039, 0.802, 0.3766, 0.8543, 0.3589, 0.5178],
   // [0.6536, 0.8932, 0.9341, 0.4822, 0.1887, 0.9457, 0.0185, 0.0163, 0.9874,
   // 0.802, 0.3766, 0.6537, 0.3589, 0.5178, 0.7816]]
-  LOG_INFO(dma_2)
+  LOG_MDA_INFO(dma_2)
 
   // [[[[1, 2, 2, 1],[2, 4, 4, 2],[2, 4, 4, 2],[2, 4, 4, 2],[2, 4, 4, 2],[1, 2,
   // 2, 1]]]]
-  LOG_INFO(dma_1.Grad())
+  LOG_MDA_INFO(dma_1.Grad())
 
   KD::Mdarray dma_3 =
       KD::Operator::CreateOperationImgToCol(dma_1, {3, 3}, {1, 1}, {1, 1});
@@ -1101,7 +1101,7 @@ void TestImg2colOperatorBackward() {
   // [0.2039, 0.802, 0.3766, 0.8543, 0.3589, 0.5178, 0, 0, 0],
   // [0.802, 0.3766, 0.6537, 0.3589, 0.5178, 0.7816, 0, 0, 0],
   // [0.3766, 0.6537, 0, 0.5178, 0.7816, 0, 0, 0, 0]]
-  LOG_INFO(dma_3)
+  LOG_MDA_INFO(dma_3)
 
   dma_3.Backward();
   auto &&dma_1_grad = dma_1.Grad();
@@ -1117,7 +1117,7 @@ void TestImg2colOperatorBackward() {
   }
   // [[[[5, 8, 8, 5],[8, 13, 13, 8],[8, 13, 13, 8],[8, 13, 13, 8],[8, 13, 13,
   // 8],[5, 8, 8, 5]]]]
-  LOG_INFO(dma_1_grad)
+  LOG_MDA_INFO(dma_1_grad)
 }
 
 void TestBroadcastingOperatorBackward() {
@@ -1133,21 +1133,21 @@ void TestBroadcastingOperatorBackward() {
   // [[6, 8, 10, 12],[10, 12, 14, 16],[14, 16, 18, 20]],
   // [[10, 12, 14, 16],[14, 16, 18, 20],[18, 20, 22, 24]]
   // ]
-  LOG_INFO(dma_3)
+  LOG_MDA_INFO(dma_3)
 
   // [
   // [[2, 8, 18, 32],[30, 48, 70, 96],[90, 120, 154, 192]],
   // [[6, 16, 30, 48],[50, 72, 98, 128],[126, 160, 198, 240]],
   // [[10, 24, 42, 64],[70, 96, 126, 160],[162, 200, 242, 288]]
   // ]
-  LOG_INFO(dma_4)
+  LOG_MDA_INFO(dma_4)
 
   // [
   // [[1, 6, 15, 28],[29, 46, 67, 92],[89, 118, 151, 188]],
   // [[1, 10, 23, 40],[45, 66, 91, 120],[121, 154, 191, 232]],
   // [[1, 14, 31, 52],[61, 86, 115, 148],[153, 190, 231, 276]]
   // ]
-  LOG_INFO(dma_5)
+  LOG_MDA_INFO(dma_5)
 
   dma_5.Backward();
   auto &&dma_1_grad = dma_1.Grad();
@@ -1167,18 +1167,18 @@ void TestBroadcastingOperatorBackward() {
     }
   }
   // [[[21, 30, 39, 48],[45, 54, 63, 72],[69, 78, 87, 96]]]
-  LOG_INFO(dma_1_grad)
+  LOG_MDA_INFO(dma_1_grad)
 
   // [[[12, 15, 18, 21]],[[12, 15, 18, 21]],[[12, 15, 18, 21]]]
-  LOG_INFO(dma_2_grad)
+  LOG_MDA_INFO(dma_2_grad)
 
   KD::Mdarray dma_6(data, KD::Shape{1, 3, 1, 2, 1, 2}, true);
   KD::Mdarray dma_7(data, KD::Shape{2, 1, 3, 2, 1, 1}, true);
   // [[[[[[1, 2]],[[3, 4]]]],[[[[5, 6]],[[7, 8]]]],[[[[9, 10]],[[11, 12]]]]]]
-  LOG_INFO(dma_6)
+  LOG_MDA_INFO(dma_6)
 
   // [[[[[[1]],[[2]]],[[[3]],[[4]]],[[[5]],[[6]]]]],[[[[[7]],[[8]]],[[[9]],[[10]]],[[[11]],[[12]]]]]]
-  LOG_INFO(dma_7)
+  LOG_MDA_INFO(dma_7)
 
   KD::Mdarray dma_8 =
       dma_6 + KD::Operator::CreateOperationSigmoid(
@@ -1202,31 +1202,31 @@ void TestBroadcastingOperatorBackward() {
   // 10.9999999943972]],[[11.9999999992417, 12.9999999997211]]],[[[9.99999999793885,
   // 10.9999999992417]],[[11.9999999998974, 12.9999999999622]]]]]] Shape: (2, 3,
   // 3, 2, 1, 2)
-  LOG_INFO(dma_8)
+  LOG_MDA_INFO(dma_8)
 
   KD::Mdarray dma_9 = KD::Operator::CreateOperationMean(dma_6 * dma_7, 0);
   // [[[[[4, 8]],[[15, 20]]],[[[6, 12]],[[21, 28]]],[[[8, 16]],[[27,
   // 36]]]],[[[[20, 24]],[[35, 40]]],[[[30, 36]],[[49, 56]]],[[[40, 48]],[[63,
   // 72]]]],[[[[36, 40]],[[55, 60]]],[[[54, 60]],[[77, 84]]],[[[72, 80]],[[99,
   // 108]]]]] Shape: (3, 3, 2, 1, 2)
-  LOG_INFO(dma_9)
+  LOG_MDA_INFO(dma_9)
 
   KD::Mdarray dma_10 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationMax(dma_9.Squeeze(), 0), 1);
   // [[45.5, 50],[65.5, 72],[85.5, 94]]
   // Shape: (3, 2)
-  LOG_INFO(dma_10)
+  LOG_MDA_INFO(dma_10)
 
   KD::Mdarray dma_11 = KD::Operator::CreateOperationLogSoftmax(dma_10);
   // [[-4.51104774484859, -0.0110477448485938],[-6.50150231015975,
   // -0.00150231015975429],[-8.50020344767213, -0.000203447672129439]] Shape:
   // (3, 2)
-  LOG_INFO(dma_11)
+  LOG_MDA_INFO(dma_11)
 
   KD::Mdarray dma_12 = dma_11.View({1, 3, 1, 2, 1, 1});
   // [[[[[[-4.51104774484859]],[[-0.0110477448485938]]]],[[[[-6.50150231015975]],[[-0.00150231015975429]]]],[[[[-8.50020344767213]],[[-0.000203447672129439]]]]]]
   // Shape: (1, 3, 1, 2, 1, 1)
-  LOG_INFO(dma_12)
+  LOG_MDA_INFO(dma_12)
 
   KD::Mdarray dma_13 = dma_8 - dma_6 - dma_12;
   // [[[[[[5.39184482282648, 5.46362187167103]],[[1.00435489392431, 1.00857512169196]]],[[[5.4930615348865,
@@ -1248,7 +1248,7 @@ void TestBroadcastingOperatorBackward() {
   // 9.50020344206933]],[[1.00020344691387, 1.00020344739318]]],[[[9.50020344561098,
   // 9.50020344691387]],[[1.00020344756951, 1.00020344763438]]]]]] Shape: (2, 3,
   // 3, 2, 1, 2)
-  LOG_INFO(dma_13)
+  LOG_MDA_INFO(dma_13)
 
   dma_13.Backward();
   auto &&dma_6_grad = dma_6.Grad();
@@ -1277,11 +1277,11 @@ void TestBroadcastingOperatorBackward() {
   // 0.00105290929349344]],[[0.000142693716168374, 5.25012982066642e-05]]]],[[[[-107.344960140055,
   // 107.345031956478]],[[-125.192711404884, 125.192714980639]]]]]] Shape: (1,
   // 3, 1, 2, 1, 2)
-  LOG_INFO(dma_6_grad)
+  LOG_MDA_INFO(dma_6_grad)
 
   // [[[[[[3.08768741677299]],[[2.94336477718262]]],[[[3.01577069082022]],[[2.9922616290275]]],[[[3.00221940298326]],[[2.99895136176505]]]]],[[[[[2.93454551962753]],[[2.93410161559743]]],[[[2.99105616167247]],[[2.99099605597267]]],[[[2.99878799934164]],[[2.99877986437328]]]]]]
   // Shape: (2, 1, 3, 2, 1, 1)
-  LOG_INFO(dma_7_grad)
+  LOG_MDA_INFO(dma_7_grad)
 }
 
 void TestConv2dModule() {
@@ -1333,7 +1333,7 @@ void TestConv2dModule() {
                   KD::Shape{2, 2, 7, 7});
   KD::Mdarray out = conv.Forward(img);
   out.Backward();
-  LOG_INFO(out)
+  LOG_MDA_INFO(out)
 
   KD::BasicData out_expect[2][3][4][5] = {
       {{{0.085057, 0.000000, 0.014622, 0.197015, 0.054076},
@@ -1373,7 +1373,7 @@ void TestConv2dModule() {
   }
 
   auto &&weight_grad = weight.Grad();
-  LOG_INFO(weight_grad)
+  LOG_MDA_INFO(weight_grad)
 
   KD::BasicData weight_grad_expect[3][12] = {
       {11.133665, 9.121082, 9.863847, 14.400089, 14.734153, 16.512037,
@@ -1421,7 +1421,7 @@ void TestLinearModule() {
   KD::Mdarray linear_out = linear.Forward(input);
   KD::Mdarray out = KD::Operator::CreateOperationLogSoftmax(linear_out);
   out.Backward();
-  LOG_INFO(out)
+  LOG_MDA_INFO(out)
 
   KD::BasicData out_expect[3][6] = {
       {-1.892938, -1.590033, -1.914817, -1.775882, -1.914817, -1.707157},
@@ -1442,7 +1442,7 @@ void TestLinearModule() {
       {0.000000, 0.000000, 0.000000, 0.000000, 0.000000},
       {-0.074985, 0.012053, 0.008624, -0.080164, 0.016362}};
   auto &&weight_grad = weight.Grad();
-  LOG_INFO(weight_grad)
+  LOG_MDA_INFO(weight_grad)
 
   for (KD::Index i = 0; i < 6; ++i) {
     for (KD::Index j = 0; j < 5; ++j) {
@@ -1454,7 +1454,7 @@ void TestLinearModule() {
   KD::BasicData bias_grad_expect[6] = {0.098009, -0.908593, 0.000000,
                                        0.034192, 0.000000,  -0.060508};
   auto &&bias_grad = bias.Grad();
-  LOG_INFO(bias_grad)
+  LOG_MDA_INFO(bias_grad)
 
   for (KD::Index i = 0; i < 6; ++i) {
     KD::BasicData value1 = bias_grad[{0, i}];
@@ -1483,7 +1483,7 @@ void TestMaxPool2dModule() {
   KD::Mdarray out =
       KD::Operator::CreateOperationMatrixMul(reduced, dma_2.View({7, 2}));
   out.Backward();
-  LOG_INFO(out)
+  LOG_MDA_INFO(out)
 
   KD::BasicData output_expect[2][2] = {{3.787218, 5.987955},
                                        {3.727950, 5.894424}};
@@ -1498,7 +1498,7 @@ void TestMaxPool2dModule() {
       {0.000000, 2.349201, 0.000000, 2.349201, 0.000000, 2.349201},
       {2.349201, 0.000000, 2.349201, 0.000000, 2.349201, 0.000000}};
   auto &&t0_grad = dma_1.Grad();
-  LOG_INFO(t0_grad)
+  LOG_MDA_INFO(t0_grad)
 
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 6; j < 6; ++j) {
@@ -1512,7 +1512,7 @@ void TestMaxPool2dModule() {
       {4.273312, 2.733193, 2.807353, 4.221796, 2.625723, 4.329186, 5.097929},
       {2.708350, 3.632129, 3.995808, 2.798316, 6.347974, 2.758435, 4.171799}};
   auto &&dma_2_grad = dma_2.Grad();
-  LOG_INFO(dma_2_grad)
+  LOG_MDA_INFO(dma_2_grad)
 
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 7; ++j) {
@@ -1576,8 +1576,8 @@ void TestCrossEntropyModule() {
     KD::BasicData value2 = bias_grad[{0, i}];
     CHECK_FLOAT_EQUAL(value1, value2, "check3");
   }
-  LOG_INFO(weight_grad)
-  LOG_INFO(bias_grad)
+  LOG_MDA_INFO(weight_grad)
+  LOG_MDA_INFO(bias_grad)
 }
 
 void TestOptimizer() {
@@ -1609,8 +1609,8 @@ void TestOptimizer() {
   out1.Backward();
   optimizer.Step();
   optimizer.ZeroGrad();
-  LOG_INFO(weight)
-  LOG_INFO(bias)
+  LOG_MDA_INFO(weight)
+  LOG_MDA_INFO(bias)
   KD::BasicData weight_expect1[4][3] = {{0.5385, -0.4537, -0.0407},
                                         {-0.3125, 0.4566, 0.1185},
                                         {-0.0457, 0.4870, -0.3354},
@@ -1631,8 +1631,8 @@ void TestOptimizer() {
   out2.Backward();
   optimizer.Step();
   optimizer.ZeroGrad();
-  LOG_INFO(weight)
-  LOG_INFO(bias)
+  LOG_MDA_INFO(weight)
+  LOG_MDA_INFO(bias)
   KD::BasicData weight_expect2[4][3] = {{0.5287, -0.4809, -0.0598},
                                         {-0.3223, 0.4293, 0.0994},
                                         {-0.0555, 0.4597, -0.3544},

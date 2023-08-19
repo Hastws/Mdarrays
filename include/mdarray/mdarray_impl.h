@@ -248,14 +248,13 @@ struct GradFn {
 
   virtual ~GradFn() = default;
 
-  struct MdarrayGradImpl
-      : public GradImpl<MdarrayGradImpl> {
+  struct MdarrayGradImpl : public GradImpl<MdarrayGradImpl> {
     const Storage &storage_;
     const Shape &shape_;
     const IndexArray &stride_;
 
     MdarrayGradImpl(const Storage &storage, const Shape &shape,
-                                   const IndexArray &stride)
+                    const IndexArray &stride)
         : storage_(storage), shape_(shape), stride_(stride) {}
 
     BasicData Eval(IndexArray &indexes) const {
