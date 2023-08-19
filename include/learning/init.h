@@ -4,16 +4,16 @@
 #include <random>
 #include <string>
 
-#include "multidimensional_arrays/multidimensional_arrays.h"
-#include "multidimensional_arrays/multidimensional_arrays_impl.h"
+#include "mdarray/mdarray.h"
+#include "mdarray/mdarray_impl.h"
 #include "utils/exception.h"
 
 namespace KD {
 namespace Learning {
 class InitializerBase {
  public:
-  explicit InitializerBase(MultidimensionalArrays &param)
-      : param_(const_cast<MultidimensionalArraysImpl &>(param.Impl())) {
+  explicit InitializerBase(Mdarray &param)
+      : param_(const_cast<MdarrayImpl &>(param.Impl())) {
     CHECK_TRUE(param_.IsContiguous(),
                "Only contiguous multidimensional arrays can be initialized.");
   }
@@ -26,12 +26,12 @@ class InitializerBase {
   BasicData *GetStorage() const { return param_.storage_.data_ptr_; }
 
   static std::default_random_engine engine_;
-  MultidimensionalArraysImpl &param_;
+  MdarrayImpl &param_;
 };
 
 class CpyInitializer : public InitializerBase {
  public:
-  CpyInitializer(MultidimensionalArrays &param, BasicData *data);
+  CpyInitializer(Mdarray &param, BasicData *data);
 
   void Init() const override;
 
@@ -43,8 +43,8 @@ class KaimingInitializer : public InitializerBase {
  public:
   enum class Mode { FAN_IN = 0, FAN_OUT = 1 };
 
-  explicit KaimingInitializer(MultidimensionalArrays &param, Mode mode = Mode::FAN_IN,
-                     bool conv_weight = false);
+  explicit KaimingInitializer(Mdarray &param, Mode mode = Mode::FAN_IN,
+                              bool conv_weight = false);
 
   void Init() const override;
 
@@ -55,8 +55,8 @@ class KaimingInitializer : public InitializerBase {
 
 class UniformInitializer : public InitializerBase {
  public:
-  explicit UniformInitializer(MultidimensionalArrays &param, BasicData a = 0.,
-                     BasicData b = 1.);
+  explicit UniformInitializer(Mdarray &param, BasicData a = 0.,
+                              BasicData b = 1.);
 
   void Init() const override;
 

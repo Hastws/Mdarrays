@@ -4,12 +4,12 @@
 #include "learning/init.h"
 #include "learning/module.h"
 #include "learning/optimizer.h"
-#include "multidimensional_arrays/multidimensional_arrays.h"
-#include "multidimensional_arrays/shape.h"
-#include "multidimensional_arrays/storage.h"
+#include "mdarray/mdarray.h"
+#include "mdarray/shape.h"
+#include "mdarray/storage.h"
 #include "utils/exception.h"
 
-void TestMultidimensionalArrays();
+void TestMdarray();
 
 void TestBasicOperator();
 
@@ -19,7 +19,7 @@ void TestNumericOperator();
 
 void TestConvOperator();
 
-void TestMultidimensionalArraysBackward();
+void TestMdarrayBackward();
 
 void TestBasicOperatorBackward();
 
@@ -45,12 +45,12 @@ int main() {
   std::chrono::steady_clock::time_point start_tp =
       std::chrono::steady_clock::now();
 
-  TestMultidimensionalArrays();
+  TestMdarray();
   TestBasicOperator();
   TestMatrixOperator();
   TestNumericOperator();
   TestConvOperator();
-  TestMultidimensionalArraysBackward();
+  TestMdarrayBackward();
   TestBasicOperatorBackward();
   TestMatrixOperatorBackward();
   TestNumericOperatorBackward();
@@ -72,9 +72,9 @@ int main() {
   return 0;
 }
 
-void TestMultidimensionalArrays() {
+void TestMdarray() {
   KD::BasicData data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  KD::MultidimensionalArrays mda_1(data, KD::Shape({3, 4}));
+  KD::Mdarray mda_1(data, KD::Shape({3, 4}));
   for (KD::Index i = 0, idx = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value = mda_1[{i, j}];
@@ -199,15 +199,15 @@ void TestMultidimensionalArrays() {
 
 void TestBasicOperator() {
   KD::BasicData data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  KD::MultidimensionalArrays mda_1(data, KD::Shape{3, 4}, true);
-  KD::MultidimensionalArrays mda_2(data, KD::Shape{3, 4});
+  KD::Mdarray mda_1(data, KD::Shape{3, 4}, true);
+  KD::Mdarray mda_2(data, KD::Shape{3, 4});
 
-  KD::MultidimensionalArrays mda_1_1 = 5.0 + mda_1;
+  KD::Mdarray mda_1_1 = 5.0 + mda_1;
   std::cout << mda_1_1 << std::endl;
   mda_1_1.Backward();
   std::cout << mda_1.Grad() << std::endl;
 
-  KD::MultidimensionalArrays mda_3 = mda_1 + mda_2;
+  KD::Mdarray mda_3 = mda_1 + mda_2;
   for (KD::Index i = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_3[{i, j}];
@@ -242,7 +242,7 @@ void TestBasicOperator() {
   // [27, 30, 33, 36]]
   LOG_INFO(mda_3)
 
-  KD::MultidimensionalArrays mda_4 = mda_1 * mda_2 + mda_3;
+  KD::Mdarray mda_4 = mda_1 * mda_2 + mda_3;
   for (KD::Index i = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_4[{i, j}];
@@ -255,8 +255,7 @@ void TestBasicOperator() {
   // [108, 130, 154, 180]]
   LOG_INFO(mda_4)
 
-  auto func = [&mda_1, &mda_2](const KD::MultidimensionalArrays &t3,
-                               const KD::MultidimensionalArrays &t4) {
+  auto func = [&mda_1, &mda_2](const KD::Mdarray &t3, const KD::Mdarray &t4) {
     auto add_exp = mda_1 + mda_2;
     auto mul_exp = -mda_1 * mda_2;
     return t3 * t4 - add_exp - mul_exp;
@@ -265,7 +264,7 @@ void TestBasicOperator() {
   // At this time, add_exp, mul_exp and other implicitly constructed Exp has
   // been deconstructed. But we expect the BinaryExpImpl hold by them is
   // still alive, untill the assignment of mda_5 completes.
-  KD::MultidimensionalArrays mda_5 = exp;
+  KD::Mdarray mda_5 = exp;
   for (KD::Index i = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_5[{i, j}];
@@ -280,10 +279,10 @@ void TestBasicOperator() {
   // [2979, 3980, 5181, 6600]]
   LOG_INFO(mda_5)
 
-  KD::MultidimensionalArrays mda_6 = mda_1.View({2, 1, 1, 2, 3});
-  KD::MultidimensionalArrays mda_7 = mda_1.View({2, 2, 1, 1, 3});
+  KD::Mdarray mda_6 = mda_1.View({2, 1, 1, 2, 3});
+  KD::Mdarray mda_7 = mda_1.View({2, 2, 1, 1, 3});
   // The shape (2, 2, 3) same as (2, 2, 3, 1, 1)
-  KD::MultidimensionalArrays mda_8 = mda_1.View({2, 2, 3});
+  KD::Mdarray mda_8 = mda_1.View({2, 2, 3});
   // [[[[[1, 2, 3],[4, 5, 6]]]],
   // [[[[7, 8, 9],[10, 11, 12]]]]]
   LOG_INFO(mda_6)
@@ -300,7 +299,7 @@ void TestBasicOperator() {
   auto exp1 = mda_6 + mda_7;
   auto exp2 = -(mda_6 * mda_8);
   auto exp3 = mda_6 - mda_8;
-  KD::MultidimensionalArrays mda_9 = exp1 + exp2 + exp3;
+  KD::Mdarray mda_9 = exp1 + exp2 + exp3;
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
       for (KD::Index k = 0; k < 3; ++k) {
@@ -336,7 +335,7 @@ void TestBasicOperator() {
   // ]
   LOG_INFO(mda_9)
 
-  KD::MultidimensionalArrays mda_10 =
+  KD::Mdarray mda_10 =
       mda_1.Transpose(0, 1) + KD::Operator::CreateOperationConstant(1, {4, 3});
   for (KD::Index i = 0; i < 4; ++i) {
     for (KD::Index j = 0; j < 3; ++j) {
@@ -353,8 +352,8 @@ void TestBasicOperator() {
 
   // assignment of uncontiguous multidimensional_arrays
   auto mda_11 = mda_1.Transpose(0, 1);
-  KD::MultidimensionalArrays mda_12 = mda_2.Transpose(0, 1);
-  KD::MultidimensionalArrays mda_13(data, mda_11.Size());
+  KD::Mdarray mda_12 = mda_2.Transpose(0, 1);
+  KD::Mdarray mda_13(data, mda_11.Size());
   mda_11 = mda_13;
   // Operation constant value is 0
   mda_12 = mda_11 + KD::Operator::CreateOperationConstant(0, {4, 3});
@@ -386,16 +385,15 @@ void TestBasicOperator() {
 void TestMatrixOperator() {
   KD::BasicData data_1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
   KD::BasicData data_2[] = {11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 121};
-  KD::MultidimensionalArrays mda_1(data_1, KD::Shape{2, 6});
-  KD::MultidimensionalArrays mda_2(data_2, KD::Shape{2, 6});
+  KD::Mdarray mda_1(data_1, KD::Shape{2, 6});
+  KD::Mdarray mda_2(data_2, KD::Shape{2, 6});
   // [[1, 2, 3, 4, 5, 6],[7, 8, 9, 10, 11, 12]]
   LOG_INFO(mda_1)
   //[[11, 21, 31, 41, 51, 61],[71, 81, 91, 101, 111, 121]]
   LOG_INFO(mda_2)
 
-  KD::MultidimensionalArrays mda_3 =
-      KD::Operator::CreateOperationMatrixTranspose(
-          KD::Operator::CreateOperationMatrixMul(mda_1, mda_2.Transpose(0, 1)));
+  KD::Mdarray mda_3 = KD::Operator::CreateOperationMatrixTranspose(
+      KD::Operator::CreateOperationMatrixMul(mda_1, mda_2.Transpose(0, 1)));
   KD::BasicData t3_expect[2][2] = {{931, 2227}, {2191, 5647}};
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
@@ -407,15 +405,14 @@ void TestMatrixOperator() {
   // [[931, 2227],[2191, 5647]]
   LOG_INFO(mda_3)
 
-  KD::MultidimensionalArrays mda_4 = mda_1.View({3, 2, 2});
-  KD::MultidimensionalArrays mda_5 = mda_2.View({3, 2, 2});
+  KD::Mdarray mda_4 = mda_1.View({3, 2, 2});
+  KD::Mdarray mda_5 = mda_2.View({3, 2, 2});
   // [[[1, 2],[3, 4]],[[5, 6],[7, 8]],[[9, 10],[11, 12]]]
   LOG_INFO(mda_4)
   // [[[11, 21],[31, 41]],[[51, 61],[71, 81]],[[91, 101],[111, 121]]]
   LOG_INFO(mda_5)
-  KD::MultidimensionalArrays mda_6 =
-      KD::Operator::CreateOperationBatchMatrixTranspose(
-          KD::Operator::CreateOperationBatchMatrixMul(mda_4, mda_5));
+  KD::Mdarray mda_6 = KD::Operator::CreateOperationBatchMatrixTranspose(
+      KD::Operator::CreateOperationBatchMatrixMul(mda_4, mda_5));
   KD::BasicData t6_expect[3][2][2] = {{{73, 157}, {103, 227}},
                                       {{681, 925}, {791, 1075}},
                                       {{1929, 2333}, {2119, 2563}}};
@@ -432,8 +429,7 @@ void TestMatrixOperator() {
   // 2563]]]
   LOG_INFO(mda_6)
 
-  KD::MultidimensionalArrays mda_7 =
-      KD::Operator::CreateOperationMatrixTranspose(mda_1);
+  KD::Mdarray mda_7 = KD::Operator::CreateOperationMatrixTranspose(mda_1);
   CHECK_EQUAL(mda_7.DimensionsSize(), 2, "check3");
   CHECK_EQUAL(mda_7.Size(0), 6, "check3");
   CHECK_EQUAL(mda_7.Size(1), 2, "check3");
@@ -447,12 +443,11 @@ void TestMatrixOperator() {
   // [[1, 7],[2, 8],[3, 9],[4, 10],[5, 11],[6, 12]]
   LOG_INFO(mda_7)
 
-  KD::MultidimensionalArrays mda_8(data_1, KD::Shape{2, 2, 3});
+  KD::Mdarray mda_8(data_1, KD::Shape{2, 2, 3});
   // [[[1, 2, 3],[4, 5, 6]],[[7, 8, 9],[10, 11, 12]]]
   LOG_INFO(mda_8)
 
-  KD::MultidimensionalArrays mda_9 =
-      KD::Operator::CreateOperationBatchMatrixTranspose(mda_8);
+  KD::Mdarray mda_9 = KD::Operator::CreateOperationBatchMatrixTranspose(mda_8);
   CHECK_EQUAL(mda_9.DimensionsSize(), 3, "check4");
   CHECK_EQUAL(mda_9.Size(0), 2, "check4");
   CHECK_EQUAL(mda_9.Size(1), 3, "check4");
@@ -474,7 +469,7 @@ void TestNumericOperator() {
   KD::BasicData data_1[] = {0.585639, 0.612628, 0.241485, 0.097616,
                             0.035854, 0.723054, 0.131163, 0.884268,
                             0.193597, 0.694748, 0.650687, 0.738797};
-  KD::MultidimensionalArrays mda_1(data_1, KD::Shape{3, 4});
+  KD::Mdarray mda_1(data_1, KD::Shape{3, 4});
   // [[0.585639, 0.612628, 0.241485, 0.097616],
   // [0.035854, 0.723054, 0.131163, 0.884268],
   // [0.193597, 0.694748, 0.650687, 0.738797]]
@@ -483,8 +478,7 @@ void TestNumericOperator() {
       {-1.208965, -1.181976, -1.553119, -1.696988},
       {-1.860054, -1.172853, -1.764744, -1.011639},
       {-1.784239, -1.283088, -1.327148, -1.239038}};
-  KD::MultidimensionalArrays mda_2 =
-      KD::Operator::CreateOperationLogSoftmax(mda_1);
+  KD::Mdarray mda_2 = KD::Operator::CreateOperationLogSoftmax(mda_1);
   for (KD::Index i = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_2[{i, j}];
@@ -505,8 +499,7 @@ void TestNumericOperator() {
   auto labels = labels_ptr.get();
   // The value of the corresponding position
   labels[0] = 2, labels[1] = 0, labels[2] = 3;
-  KD::MultidimensionalArrays mda_3 =
-      KD::Operator::CreateOperationNllLoss(mda_2, labels_ptr);
+  KD::Mdarray mda_3 = KD::Operator::CreateOperationNllLoss(mda_2, labels_ptr);
   CHECK_EQUAL(mda_3.DimensionsSize(), 1, "check2");
   CHECK_EQUAL(mda_3.Size(0), mda_2.Size(0), "check2");
   CHECK_FLOAT_EQUAL(mda_3[{0}], -t1_expect[0][2], "check2");
@@ -518,12 +511,12 @@ void TestNumericOperator() {
   KD::BasicData data_2[] = {0.096237, -0.037000, 0.028076, 0.328307,
                             0.122271, -0.017293, 0.150791, 0.421008,
                             0.322066, -0.321352, 0.319534, -0.424081};
-  KD::MultidimensionalArrays mda_4(data_2, KD::Shape{2, 2, 3});
+  KD::Mdarray mda_4(data_2, KD::Shape{2, 2, 3});
   // [[[0.096237, -0.037, 0.028076],[0.328307, 0.122271, -0.017293]],[[0.150791,
   // 0.421008, 0.322066],[-0.321352, 0.319534, -0.424081]]]
   LOG_INFO(mda_4)
 
-  KD::MultidimensionalArrays mda_5 = KD::Operator::CreateOperationMean(
+  KD::Mdarray mda_5 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationSigmoid(
           KD::Operator::CreateOperationRelu(mda_4)),
       1);
@@ -544,15 +537,14 @@ void TestNumericOperator() {
   // 0.539913834749743]]
   LOG_INFO(mda_5)
 
-  KD::MultidimensionalArrays mda_6 = KD::Operator::CreateOperationMean(
+  KD::Mdarray mda_6 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationMean(mda_5, 0), 0);
   CHECK_TRUE(mda_6.DimensionsSize() == 1 && mda_6.Size(0) == 1, "check5");
   CHECK_FLOAT_EQUAL(mda_6.Item(), 0.536944, "check5");
   // [0.536943800791578]
   LOG_INFO(mda_6)
 
-  KD::MultidimensionalArrays mda_7 =
-      KD::Operator::CreateOperationArgmax(mda_4, 1);
+  KD::Mdarray mda_7 = KD::Operator::CreateOperationArgmax(mda_4, 1);
   KD::Index t6_expect[][3] = {{1, 1, 0}, {0, 0, 0}};
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 3; ++j) {
@@ -564,7 +556,7 @@ void TestNumericOperator() {
   // [[1, 1, 0],[0, 0, 0]]
   LOG_INFO(mda_7)
 
-  KD::MultidimensionalArrays mda_8 = KD::Operator::CreateOperationMax(mda_4, 1);
+  KD::Mdarray mda_8 = KD::Operator::CreateOperationMax(mda_4, 1);
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::BasicData value1 = mda_8[{i, j}];
@@ -581,8 +573,8 @@ void TestConvOperator() {
       {0.4279, 0.7488, 0.3639, 0.5433}, {0.2849, 0.6536, 0.8932, 0.9341},
       {0.9640, 0.4822, 0.1887, 0.9457}, {0.2132, 0.0185, 0.0163, 0.9874},
       {0.2039, 0.8020, 0.3766, 0.6537}, {0.8543, 0.3589, 0.5178, 0.7816}};
-  KD::MultidimensionalArrays dma_0(reinterpret_cast<KD::BasicData *>(data),
-                                   KD::Shape{1, 1, 6, 4});
+  KD::Mdarray dma_0(reinterpret_cast<KD::BasicData *>(data),
+                    KD::Shape{1, 1, 6, 4});
   // [[[[0.4279, 0.7488, 0.3639, 0.5433],
   // [0.2849, 0.6536, 0.8932, 0.9341],
   // [0.964, 0.4822, 0.1887, 0.9457],
@@ -591,7 +583,7 @@ void TestConvOperator() {
   // [0.8543, 0.3589, 0.5178, 0.7816]]]]
   LOG_INFO(dma_0)
 
-  KD::MultidimensionalArrays dma_1 =
+  KD::Mdarray dma_1 =
       KD::Operator::CreateOperationMaxPool2d(dma_0, {2, 2}, {1, 1}, {1, 1});
   KD::Index t1_size_expect[] = {1, 1, 7, 5};
   KD::BasicData t1_expect[7][5] = {{0.4279, 0.7488, 0.7488, 0.5433, 0.5433},
@@ -620,7 +612,7 @@ void TestConvOperator() {
   // [0.8543, 0.8543, 0.5178, 0.7816, 0.7816]]]]
   LOG_INFO(dma_1)
 
-  KD::MultidimensionalArrays dma_2 =
+  KD::Mdarray dma_2 =
       KD::Operator::CreateOperationMaxPool2d(dma_1, {3, 4}, {2, 3}, {0, 1});
   KD::Index t2_size_expect[] = {1, 1, 3, 2};
   KD::BasicData t2_expect[][2] = {
@@ -638,7 +630,7 @@ void TestConvOperator() {
   // [[[[0.964, 0.9457],[0.964, 0.9874],[0.8543, 0.9874]]]]
   LOG_INFO(dma_2)
 
-  KD::MultidimensionalArrays mda_3 =
+  KD::Mdarray mda_3 =
       KD::Operator::CreateOperationImgToCol(dma_0, {4, 4}, {2, 2}, {1, 1});
   KD::Index t3_shape_expect[] = {6, 16};
   CHECK_EQUAL(mda_3.Size(0), t3_shape_expect[0], "check4");
@@ -684,8 +676,8 @@ void TestConvOperator() {
       }
     }
   }
-  KD::MultidimensionalArrays mda_4(reinterpret_cast<KD::BasicData *>(t4_data),
-                                   KD::Shape{2, 3, 6, 4});
+  KD::Mdarray mda_4(reinterpret_cast<KD::BasicData *>(t4_data),
+                    KD::Shape{2, 3, 6, 4});
   // [[[[0.4279, 0.7488, 0.3639, 0.5433],
   // [0.2849, 0.6536, 0.8932, 0.9341],
   // [0.964, 0.4822, 0.1887, 0.9457],
@@ -724,7 +716,7 @@ void TestConvOperator() {
   // [0.8543, 0.3589, 0.5178, 0.7816]]]]
   LOG_INFO(mda_4)
 
-  KD::MultidimensionalArrays mda_5 =
+  KD::Mdarray mda_5 =
       KD::Operator::CreateOperationImgToCol(mda_4, {2, 3}, {1, 2}, {2, 1});
   KD::BasicData t5_expect[18][6] = {
       {0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000},
@@ -810,21 +802,21 @@ void TestConvOperator() {
   LOG_INFO(mda_5)
 }
 
-void TestMultidimensionalArraysBackward() {
+void TestMdarrayBackward() {
   KD::BasicData data_1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  KD::MultidimensionalArrays mda_1(data_1, KD::Shape{3, 4}, true);
+  KD::Mdarray mda_1(data_1, KD::Shape{3, 4}, true);
   // [[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12]]
   LOG_INFO(mda_1)
 
-  KD::MultidimensionalArrays mda_2 = mda_1.View({2, 2, 3});
+  KD::Mdarray mda_2 = mda_1.View({2, 2, 3});
   // [[[1, 2, 3],[4, 5, 6]],[[7, 8, 9],[10, 11, 12]]]
   LOG_INFO(mda_2)
 
-  KD::MultidimensionalArrays mda_3 = mda_2.Slice(2, 1, 3);
+  KD::Mdarray mda_3 = mda_2.Slice(2, 1, 3);
   // [[[2, 3],[5, 6]],[[8, 9],[11, 12]]]
   LOG_INFO(mda_3)
 
-  KD::MultidimensionalArrays mda_4 = mda_3.Slice(1, 1);
+  KD::Mdarray mda_4 = mda_3.Slice(1, 1);
   // [[5, 6],[11, 12]]
   LOG_INFO(mda_4)
 
@@ -842,19 +834,19 @@ void TestMultidimensionalArraysBackward() {
   // [[0, 0, 0, 0],[1, 1, 0, 0],[0, 0, 1, 1]]
   LOG_INFO(grad_1)
 
-  KD::MultidimensionalArrays mda_5 = mda_1.View({3, 2, 2});
+  KD::Mdarray mda_5 = mda_1.View({3, 2, 2});
   // [[[1, 2],[3, 4]],[[5, 6],[7, 8]],[[9, 10],[11, 12]]]
   LOG_INFO(mda_5)
 
-  KD::MultidimensionalArrays mda_6 = mda_5.Transpose(0, 1);
+  KD::Mdarray mda_6 = mda_5.Transpose(0, 1);
   // [[[1, 2],[5, 6],[9, 10]],[[3, 4],[7, 8],[11, 12]]]
   LOG_INFO(mda_6)
 
-  KD::MultidimensionalArrays mda_7 = mda_6.Slice(0, 0, 1);
+  KD::Mdarray mda_7 = mda_6.Slice(0, 0, 1);
   // [[[1, 2],[5, 6],[9, 10]]]
   LOG_INFO(mda_7)
 
-  KD::MultidimensionalArrays mda_8 = mda_7.Permute({1, 2, 0});
+  KD::Mdarray mda_8 = mda_7.Permute({1, 2, 0});
   // [[[1],[2]],[[5],[6]],[[9],[10]]]
   LOG_INFO(mda_8)
 
@@ -876,17 +868,17 @@ void TestMultidimensionalArraysBackward() {
 
 void TestBasicOperatorBackward() {
   KD::BasicData data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  KD::MultidimensionalArrays mda_1(data, KD::Shape{3, 4}, true);
-  KD::MultidimensionalArrays mda_2(data, KD::Shape{3, 4}, true);
+  KD::Mdarray mda_1(data, KD::Shape{3, 4}, true);
+  KD::Mdarray mda_2(data, KD::Shape{3, 4}, true);
   // [[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12]]
   LOG_INFO(mda_1)
 
   // [[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12]]
   LOG_INFO(mda_2)
 
-  KD::MultidimensionalArrays mda_3 = mda_1 + mda_2;
-  KD::MultidimensionalArrays mda_4 = mda_1 * (-mda_3);
-  KD::MultidimensionalArrays mda_5 = mda_4 - mda_3;
+  KD::Mdarray mda_3 = mda_1 + mda_2;
+  KD::Mdarray mda_4 = mda_1 * (-mda_3);
+  KD::Mdarray mda_5 = mda_4 - mda_3;
   mda_5.Backward();
   // [[2, 4, 6, 8],[10, 12, 14, 16],[18, 20, 22, 24]]
   LOG_INFO(mda_3)
@@ -923,24 +915,23 @@ void TestBasicOperatorBackward() {
 void TestMatrixOperatorBackward() {
   KD::BasicData data_1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
   KD::BasicData data_2[] = {11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 121};
-  KD::MultidimensionalArrays mda_1(data_1, KD::Shape{2, 6}, true);
-  KD::MultidimensionalArrays mda_2(data_2, KD::Shape{2, 6}, true);
+  KD::Mdarray mda_1(data_1, KD::Shape{2, 6}, true);
+  KD::Mdarray mda_2(data_2, KD::Shape{2, 6}, true);
   // [[1, 2, 3, 4, 5, 6],[7, 8, 9, 10, 11, 12]]
   LOG_INFO(mda_1)
 
   // [[11, 21, 31, 41, 51, 61],[71, 81, 91, 101, 111, 121]]
   LOG_INFO(mda_2)
 
-  KD::MultidimensionalArrays mda_3 =
+  KD::Mdarray mda_3 =
       KD::Operator::CreateOperationMatrixMul(mda_1, mda_2.Transpose(0, 1));
   // [[931, 2191],[2227, 5647]]
   LOG_INFO(mda_3)
 
   mda_3.Backward();
-  KD::MultidimensionalArrays mda_4 = mda_1.View({3, 2, 2});
-  KD::MultidimensionalArrays mda_5 = mda_2.View({3, 2, 2});
-  KD::MultidimensionalArrays mda_6 =
-      KD::Operator::CreateOperationBatchMatrixMul(mda_4, mda_5);
+  KD::Mdarray mda_4 = mda_1.View({3, 2, 2});
+  KD::Mdarray mda_5 = mda_2.View({3, 2, 2});
+  KD::Mdarray mda_6 = KD::Operator::CreateOperationBatchMatrixMul(mda_4, mda_5);
   mda_6.Backward();
   // [[[1, 2],[3, 4]],[[5, 6],[7, 8]],[[9, 10],[11, 12]]]
   LOG_INFO(mda_4)
@@ -972,13 +963,12 @@ void TestNumericOperatorBackward() {
   KD::BasicData data_1[] = {0.585639, 0.612628, 0.241485, 0.097616,
                             0.035854, 0.723054, 0.131163, 0.884268,
                             0.193597, 0.694748, 0.650687, 0.738797};
-  KD::MultidimensionalArrays dma_1(data_1, KD::Shape{3, 4}, true);
+  KD::Mdarray dma_1(data_1, KD::Shape{3, 4}, true);
   // [[0.585639, 0.612628, 0.241485, 0.097616],[0.035854, 0.723054, 0.131163,
   // 0.884268],[0.193597, 0.694748, 0.650687, 0.738797]]
   LOG_INFO(dma_1)
 
-  KD::MultidimensionalArrays dma_2 =
-      KD::Operator::CreateOperationLogSoftmax(dma_1);
+  KD::Mdarray dma_2 = KD::Operator::CreateOperationLogSoftmax(dma_1);
   // [[-1.20896482874321, -1.18197582874321, -1.55311882874321,
   // -1.69698782874321],
   // [-1.86005323576525, -1.17285323576525, -1.76474423576525,
@@ -991,8 +981,7 @@ void TestNumericOperatorBackward() {
       KD::Allocator::SharedAllocate<KD::Index>(3 * sizeof(KD::Index));
   auto labels = labels_ptr.get();
   labels[0] = 2, labels[1] = 0, labels[2] = 3;
-  KD::MultidimensionalArrays dma_3 =
-      KD::Operator::CreateOperationNllLoss(dma_2, labels_ptr);
+  KD::Mdarray dma_3 = KD::Operator::CreateOperationNllLoss(dma_2, labels_ptr);
   // [1.55311882874321, 1.86005323576525, 1.23903866041312]
   LOG_INFO(dma_3)
 
@@ -1018,12 +1007,12 @@ void TestNumericOperatorBackward() {
   KD::BasicData data_2[] = {0.096237, -0.037000, 0.028076, 0.328307,
                             0.122271, -0.017293, 0.150791, 0.421008,
                             0.322066, -0.321352, 0.319534, -0.424081};
-  KD::MultidimensionalArrays dma_4(data_2, KD::Shape{2, 2, 3}, true);
-  KD::MultidimensionalArrays dma_5 = KD::Operator::CreateOperationMean(
+  KD::Mdarray dma_4(data_2, KD::Shape{2, 2, 3}, true);
+  KD::Mdarray dma_5 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationSigmoid(
           KD::Operator::CreateOperationRelu(dma_4)),
       1);
-  KD::MultidimensionalArrays dma_6 = KD::Operator::CreateOperationMax(dma_5, 1);
+  KD::Mdarray dma_6 = KD::Operator::CreateOperationMax(dma_5, 1);
   // [[[0.096237, -0.037, 0.028076],[0.328307, 0.122271, -0.017293]],[[0.150791,
   // 0.421008, 0.322066],[-0.321352, 0.319534, -0.424081]]]
   LOG_INFO(dma_4)
@@ -1058,8 +1047,8 @@ void TestImg2colOperatorBackward() {
       {0.4279, 0.7488, 0.3639, 0.5433}, {0.2849, 0.6536, 0.8932, 0.9341},
       {0.9640, 0.4822, 0.1887, 0.9457}, {0.2132, 0.0185, 0.0163, 0.9874},
       {0.2039, 0.8020, 0.3766, 0.6537}, {0.8543, 0.3589, 0.5178, 0.7816}};
-  KD::MultidimensionalArrays dma_1(reinterpret_cast<KD::BasicData *>(data),
-                                   KD::Shape{1, 1, 6, 4}, true);
+  KD::Mdarray dma_1(reinterpret_cast<KD::BasicData *>(data),
+                    KD::Shape{1, 1, 6, 4}, true);
   // [[[
   // [0.4279, 0.7488, 0.3639, 0.5433],
   // [0.2849, 0.6536, 0.8932, 0.9341],
@@ -1070,7 +1059,7 @@ void TestImg2colOperatorBackward() {
   // ]]]
   LOG_INFO(dma_1)
 
-  KD::MultidimensionalArrays dma_2 =
+  KD::Mdarray dma_2 =
       KD::Operator::CreateOperationImgToCol(dma_1, {5, 3}, {1, 1}, {0, 0});
   dma_2.Backward();
   // [[0.4279, 0.7488, 0.3639, 0.2849, 0.6536, 0.8932, 0.964, 0.4822, 0.1887,
@@ -1086,7 +1075,7 @@ void TestImg2colOperatorBackward() {
   // 2, 1]]]]
   LOG_INFO(dma_1.Grad())
 
-  KD::MultidimensionalArrays dma_3 =
+  KD::Mdarray dma_3 =
       KD::Operator::CreateOperationImgToCol(dma_1, {3, 3}, {1, 1}, {1, 1});
   // [[0, 0, 0, 0, 0.4279, 0.7488, 0, 0.2849, 0.6536],
   // [0, 0, 0, 0.4279, 0.7488, 0.3639, 0.2849, 0.6536, 0.8932],
@@ -1133,12 +1122,12 @@ void TestImg2colOperatorBackward() {
 
 void TestBroadcastingOperatorBackward() {
   KD::BasicData data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  KD::MultidimensionalArrays dma_1(data, KD::Shape{1, 3, 4}, true);
-  KD::MultidimensionalArrays dma_2(data, KD::Shape{3, 1, 4}, true);
+  KD::Mdarray dma_1(data, KD::Shape{1, 3, 4}, true);
+  KD::Mdarray dma_2(data, KD::Shape{3, 1, 4}, true);
 
-  KD::MultidimensionalArrays dma_3 = dma_1 + dma_2;
-  KD::MultidimensionalArrays dma_4 = dma_3 * dma_1;
-  KD::MultidimensionalArrays dma_5 = dma_4 - dma_2;
+  KD::Mdarray dma_3 = dma_1 + dma_2;
+  KD::Mdarray dma_4 = dma_3 * dma_1;
+  KD::Mdarray dma_5 = dma_4 - dma_2;
   // [
   // [[2, 4, 6, 8],[6, 8, 10, 12],[10, 12, 14, 16]],
   // [[6, 8, 10, 12],[10, 12, 14, 16],[14, 16, 18, 20]],
@@ -1183,15 +1172,15 @@ void TestBroadcastingOperatorBackward() {
   // [[[12, 15, 18, 21]],[[12, 15, 18, 21]],[[12, 15, 18, 21]]]
   LOG_INFO(dma_2_grad)
 
-  KD::MultidimensionalArrays dma_6(data, KD::Shape{1, 3, 1, 2, 1, 2}, true);
-  KD::MultidimensionalArrays dma_7(data, KD::Shape{2, 1, 3, 2, 1, 1}, true);
+  KD::Mdarray dma_6(data, KD::Shape{1, 3, 1, 2, 1, 2}, true);
+  KD::Mdarray dma_7(data, KD::Shape{2, 1, 3, 2, 1, 1}, true);
   // [[[[[[1, 2]],[[3, 4]]]],[[[[5, 6]],[[7, 8]]]],[[[[9, 10]],[[11, 12]]]]]]
   LOG_INFO(dma_6)
 
   // [[[[[[1]],[[2]]],[[[3]],[[4]]],[[[5]],[[6]]]]],[[[[[7]],[[8]]],[[[9]],[[10]]],[[[11]],[[12]]]]]]
   LOG_INFO(dma_7)
 
-  KD::MultidimensionalArrays dma_8 =
+  KD::Mdarray dma_8 =
       dma_6 + KD::Operator::CreateOperationSigmoid(
                   dma_6 + KD::Operator::CreateOperationRelu(dma_7));
   // [[[[[[1.88079707797788, 2.95257412682243]],[[3.99330714907572, 4.99752737684337]]],[[[1.98201379003791,
@@ -1215,33 +1204,31 @@ void TestBroadcastingOperatorBackward() {
   // 3, 2, 1, 2)
   LOG_INFO(dma_8)
 
-  KD::MultidimensionalArrays dma_9 =
-      KD::Operator::CreateOperationMean(dma_6 * dma_7, 0);
+  KD::Mdarray dma_9 = KD::Operator::CreateOperationMean(dma_6 * dma_7, 0);
   // [[[[[4, 8]],[[15, 20]]],[[[6, 12]],[[21, 28]]],[[[8, 16]],[[27,
   // 36]]]],[[[[20, 24]],[[35, 40]]],[[[30, 36]],[[49, 56]]],[[[40, 48]],[[63,
   // 72]]]],[[[[36, 40]],[[55, 60]]],[[[54, 60]],[[77, 84]]],[[[72, 80]],[[99,
   // 108]]]]] Shape: (3, 3, 2, 1, 2)
   LOG_INFO(dma_9)
 
-  KD::MultidimensionalArrays dma_10 = KD::Operator::CreateOperationMean(
+  KD::Mdarray dma_10 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationMax(dma_9.Squeeze(), 0), 1);
   // [[45.5, 50],[65.5, 72],[85.5, 94]]
   // Shape: (3, 2)
   LOG_INFO(dma_10)
 
-  KD::MultidimensionalArrays dma_11 =
-      KD::Operator::CreateOperationLogSoftmax(dma_10);
+  KD::Mdarray dma_11 = KD::Operator::CreateOperationLogSoftmax(dma_10);
   // [[-4.51104774484859, -0.0110477448485938],[-6.50150231015975,
   // -0.00150231015975429],[-8.50020344767213, -0.000203447672129439]] Shape:
   // (3, 2)
   LOG_INFO(dma_11)
 
-  KD::MultidimensionalArrays dma_12 = dma_11.View({1, 3, 1, 2, 1, 1});
+  KD::Mdarray dma_12 = dma_11.View({1, 3, 1, 2, 1, 1});
   // [[[[[[-4.51104774484859]],[[-0.0110477448485938]]]],[[[[-6.50150231015975]],[[-0.00150231015975429]]]],[[[[-8.50020344767213]],[[-0.000203447672129439]]]]]]
   // Shape: (1, 3, 1, 2, 1, 1)
   LOG_INFO(dma_12)
 
-  KD::MultidimensionalArrays dma_13 = dma_8 - dma_6 - dma_12;
+  KD::Mdarray dma_13 = dma_8 - dma_6 - dma_12;
   // [[[[[[5.39184482282648, 5.46362187167103]],[[1.00435489392431, 1.00857512169196]]],[[[5.4930615348865,
   // 5.50435489392431]],[[1.01013669365419, 1.01071239471813]]],[[[5.50857512169196,
   // 5.51013669365419]],[[1.01092435027261, 1.01100234697989]]]],[[[[7.49902968700312,
@@ -1307,7 +1294,7 @@ void TestConv2dModule() {
       0.083151,  -0.082815, -0.063118, -0.060334, 0.225444,  0.198153};
   KD::Learning::Conv2dWithReLU conv(2, 3, {2, 3}, {2, 1}, {1, 0});
   KD::Learning::ParamsDict params = conv.Parameters();
-  KD::MultidimensionalArrays &weight = params["weight"];
+  KD::Mdarray &weight = params["weight"];
   KD::Learning::CpyInitializer initializer(weight, weight_data);
   initializer.Init();
 
@@ -1342,9 +1329,9 @@ void TestConv2dModule() {
         {0.116356, 0.613183, 0.599636, 0.231469, 0.502692, 0.471287, 0.778603},
         {0.297628, 0.129855, 0.114448, 0.860079, 0.003179, 0.437888,
          0.744226}}}};
-  KD::MultidimensionalArrays img(reinterpret_cast<KD::BasicData *>(img_data),
-                                 KD::Shape{2, 2, 7, 7});
-  KD::MultidimensionalArrays out = conv.Forward(img);
+  KD::Mdarray img(reinterpret_cast<KD::BasicData *>(img_data),
+                  KD::Shape{2, 2, 7, 7});
+  KD::Mdarray out = conv.Forward(img);
   out.Backward();
   LOG_INFO(out)
 
@@ -1415,8 +1402,8 @@ void TestLinearModule() {
                                0.186017, -0.003390, 0.101612};
   KD::Learning::LinearWithReLU linear(5, 6);
   KD::Learning::ParamsDict params = linear.Parameters();
-  KD::MultidimensionalArrays &weight = params["weight"];
-  KD::MultidimensionalArrays &bias = params["bias"];
+  KD::Mdarray &weight = params["weight"];
+  KD::Mdarray &bias = params["bias"];
   KD::Learning::CpyInitializer weight_initializer(
       weight, reinterpret_cast<KD::BasicData *>(weight_data));
   KD::Learning::CpyInitializer bias_initializer(
@@ -1428,12 +1415,11 @@ void TestLinearModule() {
       {0.524644, 0.069943, 0.090128, 0.390283, 0.264224},
       {0.360333, 0.167909, 0.272388, 0.330552, 0.947953},
       {0.735467, 0.036351, 0.184947, 0.862948, 0.818394}};
-  KD::MultidimensionalArrays input(
-      reinterpret_cast<KD::BasicData *>(input_data), KD::Shape{3, 5});
+  KD::Mdarray input(reinterpret_cast<KD::BasicData *>(input_data),
+                    KD::Shape{3, 5});
 
-  KD::MultidimensionalArrays linear_out = linear.Forward(input);
-  KD::MultidimensionalArrays out =
-      KD::Operator::CreateOperationLogSoftmax(linear_out);
+  KD::Mdarray linear_out = linear.Forward(input);
+  KD::Mdarray out = KD::Operator::CreateOperationLogSoftmax(linear_out);
   out.Backward();
   LOG_INFO(out)
 
@@ -1484,17 +1470,17 @@ void TestMaxPool2dModule() {
   KD::BasicData data2[2][7] = {
       {0.574436, 0.286016, 0.286861, 0.392806, 0.088330, 0.456134, 0.482773},
       {0.387206, 0.814651, 0.888812, 0.004778, 0.971438, 0.481807, 0.931557}};
-  KD::MultidimensionalArrays dma_1(reinterpret_cast<KD::BasicData *>(data1),
-                                   KD::Shape{1, 2, 1, 6}, true);
-  KD::MultidimensionalArrays dma_2(reinterpret_cast<KD::BasicData *>(data2),
-                                   KD::Shape{2, 1, 7, 1}, true);
-  KD::MultidimensionalArrays img = dma_1 + dma_2;
+  KD::Mdarray dma_1(reinterpret_cast<KD::BasicData *>(data1),
+                    KD::Shape{1, 2, 1, 6}, true);
+  KD::Mdarray dma_2(reinterpret_cast<KD::BasicData *>(data2),
+                    KD::Shape{2, 1, 7, 1}, true);
+  KD::Mdarray img = dma_1 + dma_2;
 
   KD::Learning::MaxPool2d max_pool({3, 2}, {1, 2}, {1, 0});
-  KD::MultidimensionalArrays max_pool_output = max_pool.Forward(img);
-  KD::MultidimensionalArrays reduced = KD::Operator::CreateOperationMean(
+  KD::Mdarray max_pool_output = max_pool.Forward(img);
+  KD::Mdarray reduced = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationMean(max_pool_output, 0), 2);
-  KD::MultidimensionalArrays out =
+  KD::Mdarray out =
       KD::Operator::CreateOperationMatrixMul(reduced, dma_2.View({7, 2}));
   out.Backward();
   LOG_INFO(out)
@@ -1545,8 +1531,8 @@ void TestCrossEntropyModule() {
   KD::BasicData bias_data[3] = {-0.240007, 0.322247, -0.051916};
   KD::Learning::Linear linear(5, 3);
   KD::Learning::ParamsDict params = linear.Parameters();
-  KD::MultidimensionalArrays &weight = params["weight"];
-  KD::MultidimensionalArrays &bias = params["bias"];
+  KD::Mdarray &weight = params["weight"];
+  KD::Mdarray &bias = params["bias"];
   KD::Learning::CpyInitializer weight_initializer(
       weight, reinterpret_cast<KD::BasicData *>(weight_data));
   KD::Learning::CpyInitializer bias_initializer(
@@ -1559,12 +1545,12 @@ void TestCrossEntropyModule() {
       {0.861821, 0.102663, 0.949307, 0.086492, 0.588144},
       {0.788253, 0.402394, 0.554831, 0.984794, 0.170077}};
   KD::Index labels[] = {2, 1, 0};
-  KD::MultidimensionalArrays input(
-      reinterpret_cast<KD::BasicData *>(input_data), KD::Shape{3, 5});
+  KD::Mdarray input(reinterpret_cast<KD::BasicData *>(input_data),
+                    KD::Shape{3, 5});
 
   KD::Learning::CrossEntropy criterion;
-  KD::MultidimensionalArrays out = linear.Forward(input);
-  KD::MultidimensionalArrays loss = criterion.Forward(out, labels);
+  KD::Mdarray out = linear.Forward(input);
+  KD::Mdarray loss = criterion.Forward(out, labels);
   loss.Backward();
 
   KD::BasicData loss_expect = 1.157702;
@@ -1602,8 +1588,8 @@ void TestOptimizer() {
   KD::BasicData bias_data[4] = {0.1618, -0.4150, 0.1099, 0.2695};
   KD::Learning::Linear linear(3, 4);
   KD::Learning::ParamsDict params = linear.Parameters();
-  KD::MultidimensionalArrays &weight = params["weight"];
-  KD::MultidimensionalArrays &bias = params["bias"];
+  KD::Mdarray &weight = params["weight"];
+  KD::Mdarray &bias = params["bias"];
   KD::Learning::CpyInitializer weight_initializer(
       weight, reinterpret_cast<KD::BasicData *>(weight_data));
   KD::Learning::CpyInitializer bias_initializer(
@@ -1616,10 +1602,10 @@ void TestOptimizer() {
 
   KD::BasicData input_data[2][3] = {{0.4746, 0.5383, 0.2668},
                                     {0.0405, 0.8955, 0.7365}};
-  KD::MultidimensionalArrays input(
-      reinterpret_cast<KD::BasicData *>(input_data), KD::Shape{2, 3});
+  KD::Mdarray input(reinterpret_cast<KD::BasicData *>(input_data),
+                    KD::Shape{2, 3});
 
-  KD::MultidimensionalArrays out1 = linear.Forward(input);
+  KD::Mdarray out1 = linear.Forward(input);
   out1.Backward();
   optimizer.Step();
   optimizer.ZeroGrad();
@@ -1641,7 +1627,7 @@ void TestOptimizer() {
     CHECK_FLOAT_EQUAL(value1, value2, "check1");
   }
 
-  KD::MultidimensionalArrays out2 = linear.Forward(input);
+  KD::Mdarray out2 = linear.Forward(input);
   out2.Backward();
   optimizer.Step();
   optimizer.ZeroGrad();

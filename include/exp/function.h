@@ -192,7 +192,7 @@ Exp<UnaryExpImpl<MatrixTranspose, OIType>> CreateOperationMatrixTranspose(
     const Exp<OIType> &operand) {
   CHECK_EQUAL(operand.Impl().DimensionsSize(), 2,
               "Matrix Transpose is only supported for 2D "
-              "MultidimensionalArrays, but got "
+              "Mdarray, but got "
                   << operand.Impl().DimensionsSize() << " one");
   return CreateUnaryOperationFunction<MatrixTranspose, OIType>(operand);
 }
@@ -202,7 +202,7 @@ Exp<UnaryExpImpl<BatchMatrixTranspose, OIType>>
 CreateOperationBatchMatrixTranspose(const Exp<OIType> &operand) {
   CHECK_EQUAL(operand.Impl().DimensionsSize(), 3,
               "Batch Matrix Transpose is only supported for 3D "
-              "MultidimensionalArrays, but got "
+              "Mdarray, but got "
                   << operand.Impl().DimensionsSize() << " one");
   return CreateUnaryOperationFunction<BatchMatrixTranspose, OIType>(operand);
 }
@@ -211,16 +211,18 @@ template <typename LhsImplType, typename RhsImplType>
 Exp<BinaryExpImpl<MatrixMul, LhsImplType, RhsImplType>>
 CreateOperationMatrixMul(const Exp<LhsImplType> &lhs,
                          const Exp<RhsImplType> &rhs) {
+#ifndef NDEBUG
   auto &lhs_impl = lhs.Impl();
   auto &rhs_impl = rhs.Impl();
   CHECK_TRUE(lhs_impl.DimensionsSize() == 2 && rhs_impl.DimensionsSize() == 2,
              "Matrices expected, got " << lhs_impl.DimensionsSize() << " and "
                                        << rhs_impl.DimensionsSize()
-                                       << " MultidimensionalArrays.");
+                                       << " Mdarray.");
   CHECK_EQUAL(lhs_impl.Size(1), rhs_impl.Size(0),
               "Size mismatch, m1: ["
                   << lhs_impl.Size(0) << ", " << lhs_impl.Size(1) << "], m2: ["
                   << rhs_impl.Size(0) << ", " << rhs_impl.Size(1) << "].");
+#endif
   return CreateBinaryOperationFunction<MatrixMul, LhsImplType, RhsImplType>(
       lhs, rhs);
 }
@@ -229,12 +231,13 @@ template <typename LhsImplType, typename RhsImplType>
 Exp<BinaryExpImpl<BatchMatrixMul, LhsImplType, RhsImplType>>
 CreateOperationBatchMatrixMul(const Exp<LhsImplType> &lhs,
                               const Exp<RhsImplType> &rhs) {
+#ifndef NDEBUG
   auto &lhs_impl = lhs.Impl();
   auto &rhs_impl = rhs.Impl();
   CHECK_TRUE(lhs_impl.DimensionsSize() == 3 && rhs_impl.DimensionsSize() == 3,
              "Baths of Matrices expected, got "
                  << lhs_impl.DimensionsSize() << " and "
-                 << rhs_impl.DimensionsSize() << " MultidimensionalArrays");
+                 << rhs_impl.DimensionsSize() << " Mdarray");
   CHECK_TRUE(lhs_impl.Size(0) == rhs_impl.Size(0),
              "Bath sizes, " << lhs_impl.Size(0) << " and " << rhs_impl.Size(0)
                             << ", doesn't match.");
@@ -242,6 +245,7 @@ CreateOperationBatchMatrixMul(const Exp<LhsImplType> &lhs,
               "Size mismatch, m1: ["
                   << lhs_impl.Size(1) << ", " << lhs_impl.Size(2) << "], m2: ["
                   << rhs_impl.Size(1) << ", " << rhs_impl.Size(2) << "].");
+#endif
   return CreateBinaryOperationFunction<BatchMatrixMul, LhsImplType,
                                        RhsImplType>(lhs, rhs);
 }
@@ -252,7 +256,7 @@ Exp<UnaryExpImpl<LogSoftmax, OIType>> CreateOperationLogSoftmax(
     const Exp<OIType> &operand) {
   CHECK_EQUAL(operand.Impl().DimensionsSize(), 2,
               "CreateOperationLogSoftmax Only supported for 2D "
-              "MultidimensionalArrays, but got a "
+              "Mdarray, but got a "
                   << operand.Impl().DimensionsSize() << " one");
   return CreateUnaryOperationFunction<LogSoftmax, OIType>(operand);
 }
@@ -299,10 +303,10 @@ template <typename OIType>
 Exp<UnaryExpImpl<NLLLoss, OIType>> CreateOperationNllLoss(
     const Exp<OIType> &operand, const std::shared_ptr<Index> &labels_ptr,
     Index n_label = -1) {
-  CHECK_EQUAL(
-      operand.Impl().DimensionsSize(), 2,
-      "NLL Loss is only supported for 2D MultidimensionalArrays, but got "
-          << operand.Impl().DimensionsSize() << " one.");
+  CHECK_EQUAL(operand.Impl().DimensionsSize(), 2,
+              "NLL Loss is only supported for 2D Mdarray, but got "
+                  << operand.Impl().DimensionsSize() << " one.");
+#ifndef NDEBUG
   Index n_batch = operand.Impl().Size(0);
   Index n_cls = operand.Impl().Size(1);
   CHECK_TRUE(
@@ -314,6 +318,7 @@ Exp<UnaryExpImpl<NLLLoss, OIType>> CreateOperationNllLoss(
     CHECK_IN_RANGE(labels[i], 0, n_cls,
                    n_cls << " classes got label of " << labels[i]);
   }
+#endif
   return Exp<UnaryExpImpl<NLLLoss, OIType>>(
       Allocator::UniqueConstruct<UnaryExpImpl<NLLLoss, OIType>>(
           operand.ImplPtr(), labels_ptr));
@@ -322,12 +327,12 @@ Exp<UnaryExpImpl<NLLLoss, OIType>> CreateOperationNllLoss(
 template <typename OIType>
 Exp<UnaryExpImpl<NLLLoss, OIType>> CreateOperationNllLoss(
     const Exp<OIType> &operand, const Index *labels, Index n_label = -1) {
-  CHECK_EQUAL(
-      operand.Impl().DimensionsSize(), 2,
-      "NLL Loss is only supported for 2D MultidimensionalArrays, but got "
-          << operand.Impl().DimensionsSize() << " one.");
+  CHECK_EQUAL(operand.Impl().DimensionsSize(), 2,
+              "NLL Loss is only supported for 2D Mdarray, but got "
+                  << operand.Impl().DimensionsSize() << " one.");
 
   Index n_batch = operand.Impl().Size(0);
+#ifndef NDEBUG
   Index n_cls = operand.Impl().Size(1);
   CHECK_TRUE(n_label == KD::Index(-1) || n_label == n_batch,
              "Batch Size mismatch, x: " << n_batch << ", labels: " << n_label);
@@ -335,6 +340,7 @@ Exp<UnaryExpImpl<NLLLoss, OIType>> CreateOperationNllLoss(
   for (Index i = 0; i < n_batch; ++i)
     CHECK_IN_RANGE(labels[i], 0, n_cls,
                    n_cls << " classes got label of " << labels[i]);
+#endif
 
   std::shared_ptr<Index> labels_ptr =
       Allocator::SharedAllocate<Index>(n_batch * sizeof(Index));
@@ -351,10 +357,9 @@ Exp<UnaryExpImpl<Img2col, OIType>> CreateOperationImgToCol(
     const Exp<OIType> &operand, const Img2col::MatrixSize &kernel_size,
     const Img2col::MatrixSize &stride_size,
     const Img2col::MatrixSize &padding_size) {
-  CHECK_EQUAL(
-      operand.Impl().DimensionsSize(), 4,
-      "Img2col is only supported for 4D MultidimensionalArrays, but got a "
-          << operand.Impl().DimensionsSize() << " one");
+  CHECK_EQUAL(operand.Impl().DimensionsSize(), 4,
+              "Img2col is only supported for 4D Mdarray, but got a "
+                  << operand.Impl().DimensionsSize() << " one");
   CHECK_INDEX_VALID(kernel_size.first, "Invalid kernel_size.");
   CHECK_INDEX_VALID(kernel_size.second, "Invalid kernel_size.");
   CHECK_IN_RANGE(stride_size.first, 1, INDEX_MAX, "Invalid stride_size.");
@@ -379,10 +384,9 @@ Exp<UnaryExpImpl<MaxPool2d, OIType>> CreateOperationMaxPool2d(
     const Exp<OIType> &operand, const MaxPool2d::MatrixSize &kernel_size,
     const MaxPool2d::MatrixSize &stride_size,
     const MaxPool2d::MatrixSize &padding_size) {
-  CHECK_EQUAL(
-      operand.Impl().DimensionsSize(), 4,
-      "MaxPool2d is only supported for 4D MultidimensionalArrays, but got a "
-          << operand.Impl().DimensionsSize() << " one");
+  CHECK_EQUAL(operand.Impl().DimensionsSize(), 4,
+              "MaxPool2d is only supported for 4D Mdarray, but got a "
+                  << operand.Impl().DimensionsSize() << " one");
   CHECK_INDEX_VALID(kernel_size.first, "Invalid kernel_size.");
   CHECK_INDEX_VALID(kernel_size.second, "Invalid kernel_size.");
   CHECK_IN_RANGE(stride_size.first, 1, INDEX_MAX, "Invalid stride_size.");

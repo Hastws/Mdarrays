@@ -8,11 +8,21 @@
 #include <tuple>
 #include <vector>
 
+#include "memory_pool/allocator.h"
 #include "utils/exception.h"
 
 namespace KD {
 namespace SourceData {
-unsigned int __reverse_int(int i) {
+unsigned int ReverseInt(int i) {
+  unsigned char ch1, ch2, ch3, ch4;
+  ch1 = i & 255;
+  ch2 = (i >> 8) & 255;
+  ch3 = (i >> 16) & 255;
+  ch4 = (i >> 24) & 255;
+  return ((int)ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
+}
+
+unsigned int ReverseInt(unsigned int i) {
   unsigned char ch1, ch2, ch3, ch4;
   ch1 = i & 255;
   ch2 = (i >> 8) & 255;
@@ -34,16 +44,19 @@ MNIST::MNIST(const std::string &img_path, const std::string &label_path,
 }
 
 std::pair<const BasicData *, Index> MNIST::GetSample(Index idx) const {
-  return {reinterpret_cast<const BasicData *>(&samples_size_[idx]), labels_[idx]};
+  return {reinterpret_cast<const BasicData *>(&samples_size_[idx]),
+          labels_[idx]};
 }
 
 std::tuple<Index, const BasicData *, const Index *> MNIST::GetBatch(
     Index idx) const {
-  Index n_samples =
-      (idx == batches_size_ - 1) ? samples_size_.size() - idx * batch_size_ : batch_size_;
-  return {n_samples,
-          reinterpret_cast<const BasicData *>(&samples_size_[idx * batch_size_]),
-          &labels_[idx * batch_size_]};
+  Index n_samples = (idx == batches_size_ - 1)
+                        ? samples_size_.size() - idx * batch_size_
+                        : batch_size_;
+  return {
+      n_samples,
+      reinterpret_cast<const BasicData *>(&samples_size_[idx * batch_size_]),
+      &labels_[idx * batch_size_]};
 }
 
 void MNIST::Shuffle() {
@@ -64,8 +77,7 @@ void MNIST::ReadMnistImages(const std::string &path) {
 
   unsigned int headers[4];
   file.read(reinterpret_cast<char *>(headers), 16);
-  Index magic_number = __reverse_int(headers[0]);
-  Index n_imgs = __reverse_int(headers[1]);
+  Index n_imgs = ReverseInt(headers[1]);
   Index n_bytes = n_imgs * Img::n_pixels_;
 
   auto char_data_ptr = std::unique_ptr<char[]>(new char[n_bytes]);
@@ -75,8 +87,8 @@ void MNIST::ReadMnistImages(const std::string &path) {
   samples_size_.reserve(n_imgs);
   for (Index i = 0; i < n_imgs; ++i) {
     samples_size_.push_back({});
-    auto dist =
-        reinterpret_cast<BasicData *>(samples_size_.data()) + i * Img::n_pixels_;
+    auto dist = reinterpret_cast<BasicData *>(samples_size_.data()) +
+                i * Img::n_pixels_;
     auto src = uchar_data + i * Img::n_pixels_;
     for (Index j = 0; j < Img::n_pixels_; ++j) dist[j] = src[j] / 255.0;
   }
@@ -90,8 +102,7 @@ void MNIST::ReadMnistLabels(const std::string &path) {
 
   unsigned int headers[2];
   file.read(reinterpret_cast<char *>(headers), 8);
-  Index magic_number = __reverse_int(headers[0]);
-  Index n_imgs = __reverse_int(headers[1]);
+  Index n_imgs = ReverseInt(headers[1]);
   Index n_bytes = n_imgs;
 
   auto char_data_ptr = std::unique_ptr<char[]>(new char[n_bytes]);
@@ -163,8 +174,9 @@ void Cifar10::ReadBin(const std::string &bin_path) {
   }
 
   Index sample_size = 1 + Img::n_pixels_;
-  std::unique_ptr<char> char_data_ptr(new char[sample_size]);
-  auto char_data = char_data_ptr.get();
+  Allocator::UniquePtr<char> p =
+      Allocator::UniqueAllocate<char>(sample_size * sizeof(char));
+  auto char_data = p.get();
   auto uchar_data = reinterpret_cast<unsigned char *>(char_data);
 
   while (file.peek() != EOF) {

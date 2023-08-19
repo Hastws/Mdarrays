@@ -1,4 +1,4 @@
-#include "multidimensional_arrays/shape.h"
+#include "mdarray/shape.h"
 
 namespace KD {
 

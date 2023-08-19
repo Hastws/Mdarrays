@@ -7,19 +7,17 @@
 #include <unordered_map>
 #include <vector>
 
-#include "multidimensional_arrays/multidimensional_arrays.h"
+#include "mdarray/mdarray.h"
 
 namespace KD {
 namespace Learning {
 class ParamsDict
-    : public std::unordered_map<
-          std::string, std::reference_wrapper<MultidimensionalArrays>> {
+    : public std::unordered_map<std::string, std::reference_wrapper<Mdarray>> {
  public:
   ParamsDict() = default;
 
   ParamsDict(std::initializer_list<value_type> items)
-      : std::unordered_map<std::string,
-                           std::reference_wrapper<MultidimensionalArrays>>(
+      : std::unordered_map<std::string, std::reference_wrapper<Mdarray>>(
             items) {}
 
   ParamsDict(std::initializer_list<std::pair<std::string, ParamsDict>> dicts) {
@@ -33,7 +31,7 @@ class ParamsDict
     }
   }
 
-  MultidimensionalArrays &operator[](const std::string &key) {
+  Mdarray &operator[](const std::string &key) {
     auto iter = find(key);
     return iter->second.get();
   }
@@ -41,8 +39,7 @@ class ParamsDict
 
 class Module {
  public:
-  virtual MultidimensionalArrays Forward(
-      const MultidimensionalArrays &input) = 0;
+  virtual Mdarray Forward(const Mdarray &input) = 0;
 
   virtual ParamsDict Parameters() = 0;
 
@@ -57,20 +54,20 @@ class Linear : public Module {
 
   ~Linear() override = default;
 
-  MultidimensionalArrays Forward(const MultidimensionalArrays &input) override;
+  Mdarray Forward(const Mdarray &input) override;
 
   ParamsDict Parameters() override;
 
  protected:
-  MultidimensionalArrays weight_;
-  MultidimensionalArrays bias_;
+  Mdarray weight_;
+  Mdarray bias_;
 };
 
 class LinearWithReLU : public Linear {
  public:
   LinearWithReLU(Index in_features, Index out_features);
 
-  MultidimensionalArrays Forward(const MultidimensionalArrays &input) override;
+  Mdarray Forward(const Mdarray &input) override;
 };
 
 class Conv2d : public Module {
@@ -84,7 +81,7 @@ class Conv2d : public Module {
 
   ~Conv2d() override = default;
 
-  MultidimensionalArrays Forward(const MultidimensionalArrays &input) override;
+  Mdarray Forward(const Mdarray &input) override;
 
   ParamsDict Parameters() override;
 
@@ -96,7 +93,7 @@ class Conv2d : public Module {
   MatrixSize stride_;
   MatrixSize padding_;
 
-  MultidimensionalArrays weight_;
+  Mdarray weight_;
 };
 
 class Conv2dWithReLU : public Conv2d {
@@ -105,21 +102,20 @@ class Conv2dWithReLU : public Conv2d {
                  const MatrixSize &kernel_size, const MatrixSize &stride,
                  const MatrixSize &padding);
 
-  MultidimensionalArrays Forward(const MultidimensionalArrays &input) override;
+  Mdarray Forward(const Mdarray &input) override;
 };
 
 class MaxPool2d : public Module {
  public:
   using MatrixSize = Operator::Img2col::MatrixSize;
 
-  MaxPool2d(MatrixSize kernel_size, MatrixSize stride,
-            MatrixSize padding);
+  MaxPool2d(MatrixSize kernel_size, MatrixSize stride, MatrixSize padding);
 
   MaxPool2d(const MaxPool2d &other) = delete;
 
   ~MaxPool2d() override = default;
 
-  MultidimensionalArrays Forward(const MultidimensionalArrays &input) override;
+  Mdarray Forward(const Mdarray &input) override;
 
   ParamsDict Parameters() override;
 
@@ -135,8 +131,7 @@ class CrossEntropy {
 
   ~CrossEntropy() = default;
 
-  MultidimensionalArrays Forward(const MultidimensionalArrays &input,
-                                 const Index *labels);
+  Mdarray Forward(const Mdarray &input, const Index *labels);
 };
 
 }  // namespace Learning

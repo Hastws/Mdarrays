@@ -1,4 +1,4 @@
-#include "multidimensional_arrays/storage.h"
+#include "mdarray/storage.h"
 
 #include <cstring>
 

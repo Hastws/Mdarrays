@@ -8,7 +8,7 @@ namespace Learning {
 std::default_random_engine InitializerBase::engine_(
     std::chrono::system_clock::now().time_since_epoch().count());
 
-CpyInitializer::CpyInitializer(MultidimensionalArrays &param, BasicData *data)
+CpyInitializer::CpyInitializer(Mdarray &param, BasicData *data)
     : InitializerBase(param), data_(data) {}
 
 void CpyInitializer::Init() const {
@@ -17,7 +17,7 @@ void CpyInitializer::Init() const {
   for (Index i = 0; i < data_size; ++i) storage_data_ptr[i] = data_[i];
 }
 
-KaimingInitializer::KaimingInitializer(MultidimensionalArrays &param, Mode mode,
+KaimingInitializer::KaimingInitializer(Mdarray &param, Mode mode,
                                        bool conv_weight)
     : InitializerBase(param), mode_(mode), conv_weight_(conv_weight) {}
 
@@ -35,7 +35,7 @@ void KaimingInitializer::Init() const {
   }
 }
 
-UniformInitializer::UniformInitializer(MultidimensionalArrays &param,
+UniformInitializer::UniformInitializer(Mdarray &param,
                                        BasicData a, BasicData b)
     : InitializerBase(param), a_(a), b_(b) {}
 

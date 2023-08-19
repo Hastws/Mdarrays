@@ -5,7 +5,7 @@
 #include "exp/function.h"
 #include "learning/module.h"
 #include "learning/optimizer.h"
-#include "multidimensional_arrays/multidimensional_arrays.h"
+#include "mdarray/mdarray.h"
 
 class SimpleCNN : public KD::Learning::Module {
  public:
@@ -13,18 +13,17 @@ class SimpleCNN : public KD::Learning::Module {
 
   ~SimpleCNN() override = default;
 
-  KD::MultidimensionalArrays Forward(
-      const KD::MultidimensionalArrays &input) override {
-    KD::MultidimensionalArrays conv_0 = conv_0_.Forward(input);
-    KD::MultidimensionalArrays pool_0 = pool_0_.Forward(conv_0);
-    KD::MultidimensionalArrays conv_1 = conv_1_.Forward(pool_0);
-    KD::MultidimensionalArrays pool_1 = pool_1_.Forward(conv_1);
+  KD::Mdarray Forward(const KD::Mdarray &input) override {
+    KD::Mdarray conv_0 = conv_0_.Forward(input);
+    KD::Mdarray pool_0 = pool_0_.Forward(conv_0);
+    KD::Mdarray conv_1 = conv_1_.Forward(pool_0);
+    KD::Mdarray pool_1 = pool_1_.Forward(conv_1);
 
-    KD::MultidimensionalArrays feat(pool_1.Size());
+    KD::Mdarray feat(pool_1.Size());
     feat = pool_1;
-    KD::MultidimensionalArrays linear_0 =
+    KD::Mdarray linear_0 =
         linear_0_.Forward(feat.View({feat.Size(0), 16 * 5 * 5}));
-    KD::MultidimensionalArrays linear_1 = linear_1_.Forward(linear_0);
+    KD::Mdarray linear_1 = linear_1_.Forward(linear_0);
     return linear_1;
   }
 
@@ -106,13 +105,13 @@ int main() {
     for (KD::Index j = 0; j < train_dataset.n_batchs(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
           train_dataset.get_batch(j);
-      KD::MultidimensionalArrays input(
-          batch_samples, {n_samples, KD::SourceData::Cifar10::Img::n_channels_,
-                          KD::SourceData::Cifar10::Img::n_rows_,
-                          KD::SourceData::Cifar10::Img::n_cols_});
+      KD::Mdarray input(batch_samples,
+                        {n_samples, KD::SourceData::Cifar10::Img::n_channels_,
+                         KD::SourceData::Cifar10::Img::n_rows_,
+                         KD::SourceData::Cifar10::Img::n_cols_});
 
-      KD::MultidimensionalArrays output = scnn.Forward(input);
-      KD::MultidimensionalArrays loss = criterion.Forward(output, batch_labels);
+      KD::Mdarray output = scnn.Forward(input);
+      KD::Mdarray loss = criterion.Forward(output, batch_labels);
       loss.Backward();
 
       optimizer.Step();
@@ -129,14 +128,13 @@ int main() {
     for (KD::Index j = 0; j < val_dataset.n_batchs(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
           val_dataset.get_batch(j);
-      KD::MultidimensionalArrays input(
-          batch_samples, {n_samples, KD::SourceData::Cifar10::Img::n_channels_,
-                          KD::SourceData::Cifar10::Img::n_rows_,
-                          KD::SourceData::Cifar10::Img::n_cols_});
+      KD::Mdarray input(batch_samples,
+                        {n_samples, KD::SourceData::Cifar10::Img::n_channels_,
+                         KD::SourceData::Cifar10::Img::n_rows_,
+                         KD::SourceData::Cifar10::Img::n_cols_});
 
-      KD::MultidimensionalArrays output = scnn.Forward(input);
-      KD::MultidimensionalArrays predict =
-          KD::Operator::CreateOperationArgmax(output, 1);
+      KD::Mdarray output = scnn.Forward(input);
+      KD::Mdarray predict = KD::Operator::CreateOperationArgmax(output, 1);
       for (KD::Index k = 0; k < n_samples; ++k) {
         ++total_samples;
         KD::Index pd_label = predict[{k}];

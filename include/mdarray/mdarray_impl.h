@@ -1,5 +1,5 @@
-#ifndef MULTIDIMENSIONAL_ARRAYS_INCLUDE_MULTIDIMENSIONAL_ARRAYS_MULTIDIMENSIONAL_ARRAYS_IMPL_H
-#define MULTIDIMENSIONAL_ARRAYS_INCLUDE_MULTIDIMENSIONAL_ARRAYS_MULTIDIMENSIONAL_ARRAYS_IMPL_H
+#ifndef MULTIDIMENSIONAL_ARRAYS_INCLUDE_MDARRAY_MDARRAY_IMPL_H
+#define MULTIDIMENSIONAL_ARRAYS_INCLUDE_MDARRAY_MDARRAY_IMPL_H
 
 #include <initializer_list>
 #include <utility>
@@ -7,8 +7,8 @@
 #include "exp/exp.h"
 #include "exp/exp_impl.h"
 #include "exp/operator/basic_op.h"
-#include "multidimensional_arrays/shape.h"
-#include "multidimensional_arrays/storage.h"
+#include "mdarray/shape.h"
+#include "mdarray/storage.h"
 #include "utils/exception.h"
 
 namespace KD {
@@ -22,38 +22,35 @@ class InitializerBase;
 class OptimizerBase;
 }  // namespace Learning
 
-class MultidimensionalArraysImpl : public ExpImpl<MultidimensionalArraysImpl> {
+// Multidimensional array
+class MdarrayImpl : public ExpImpl<MdarrayImpl> {
  public:
   // To be consistent with UnaryImpl
   using Operator = Operator::Identity;
-  using operand_type = MultidimensionalArraysImpl;
+  using operand_type = MdarrayImpl;
 
   // constructor
-  MultidimensionalArraysImpl(const Storage &storage, const Shape &shape,
-                             const IndexArray &stride,
-                             bool requires_grad = false);
+  MdarrayImpl(const Storage &storage, const Shape &shape,
+              const IndexArray &stride, bool requires_grad = false);
 
-  MultidimensionalArraysImpl(Storage storage, Shape shape,
-                             bool requires_grad = false);
+  MdarrayImpl(Storage storage, Shape shape, bool requires_grad = false);
 
-  MultidimensionalArraysImpl(const BasicData *data, const Shape &shape,
-                             bool requires_grad = false);
+  MdarrayImpl(const BasicData *data, const Shape &shape,
+              bool requires_grad = false);
 
-  explicit MultidimensionalArraysImpl(const Shape &shape,
-                                      bool requires_grad = false);
+  explicit MdarrayImpl(const Shape &shape, bool requires_grad = false);
 
-  MultidimensionalArraysImpl(Storage &&storage, Shape &&shape,
-                             IndexArray &&stride, bool requires_grad = false);
+  MdarrayImpl(Storage &&storage, Shape &&shape, IndexArray &&stride,
+              bool requires_grad = false);
 
   template <typename ImplType>
-  MultidimensionalArraysImpl(const ImplType &impl);
+  MdarrayImpl(const ImplType &impl);
 
-  MultidimensionalArraysImpl(const MultidimensionalArraysImpl &other) = delete;
+  MdarrayImpl(const MdarrayImpl &other) = delete;
 
-  MultidimensionalArraysImpl(MultidimensionalArraysImpl &&other) = default;
+  MdarrayImpl(MdarrayImpl &&other) = default;
 
-  MultidimensionalArraysImpl &operator=(
-      const MultidimensionalArraysImpl &other);
+  MdarrayImpl &operator=(const MdarrayImpl &other);
 
   // inline function
   Index DimensionsSize() const { return shape_.DimensionsSize(); }
@@ -73,7 +70,7 @@ class MultidimensionalArraysImpl : public ExpImpl<MultidimensionalArraysImpl> {
   // other method
   bool IsContiguous() const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> Grad() const;
+  Allocator::UniquePtr<MdarrayImpl> Grad() const;
 
   BasicData &operator[](std::initializer_list<Index> indexes);
 
@@ -81,24 +78,20 @@ class MultidimensionalArraysImpl : public ExpImpl<MultidimensionalArraysImpl> {
 
   BasicData Item() const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> Slice(Index dim,
-                                                         Index idx) const;
+  Allocator::UniquePtr<MdarrayImpl> Slice(Index dim, Index idx) const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> Slice(Index dim,
-                                                         Index start_idx,
-                                                         Index end_idx) const;
+  Allocator::UniquePtr<MdarrayImpl> Slice(Index dim, Index start_idx,
+                                          Index end_idx) const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> Transpose(Index dim1,
-                                                             Index dim2) const;
+  Allocator::UniquePtr<MdarrayImpl> Transpose(Index dim1, Index dim2) const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> View(
-      const Shape &shape) const;
+  Allocator::UniquePtr<MdarrayImpl> View(const Shape &shape) const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> Squeeze() const;
+  Allocator::UniquePtr<MdarrayImpl> Squeeze() const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> Unsqueeze(Index dim) const;
+  Allocator::UniquePtr<MdarrayImpl> Unsqueeze(Index dim) const;
 
-  Allocator::UniquePtr<MultidimensionalArraysImpl> Permute(
+  Allocator::UniquePtr<MdarrayImpl> Permute(
       std::initializer_list<Index> dims) const;
 
   // member function for expression template
@@ -107,12 +100,12 @@ class MultidimensionalArraysImpl : public ExpImpl<MultidimensionalArraysImpl> {
   BasicData Eval(Index idx) const;
 
   template <typename ImplType>
-  MultidimensionalArraysImpl &operator=(const ImplType &exp_impl);
+  MdarrayImpl &operator=(const ImplType &exp_impl);
 
   template <typename ImplType>
-  MultidimensionalArraysImpl &operator+=(const ImplType &exp_impl);
+  MdarrayImpl &operator+=(const ImplType &exp_impl);
 
-  friend ExpImplPtr<MultidimensionalArraysImpl>;
+  friend ExpImplPtr<MdarrayImpl>;
 
   friend class Learning::InitializerBase;
 
@@ -133,8 +126,8 @@ class MultidimensionalArraysImpl : public ExpImpl<MultidimensionalArraysImpl> {
 };
 
 template <typename Stream>
-Stream &operator<<(Stream &stream, const MultidimensionalArraysImpl &src) {
-  MultidimensionalArraysImpl t(src.Size());
+Stream &operator<<(Stream &stream, const MdarrayImpl &src) {
+  MdarrayImpl t(src.Size());
   t = src;
 
   stream << '[';
@@ -163,52 +156,45 @@ Stream &operator<<(Stream &stream, const MultidimensionalArraysImpl &src) {
 
 // Template specialization for ExpImplPtr
 template <>
-class ExpImplPtr<MultidimensionalArraysImpl> {
+class ExpImplPtr<MdarrayImpl> {
  public:
-  ExpImplPtr(Allocator::UniquePtr<MultidimensionalArraysImpl> &&ptr,
-             bool with_grad)
+  ExpImplPtr(Allocator::UniquePtr<MdarrayImpl> &&ptr, bool with_grad)
       : ptr_(ptr.release()),
-        with_grad_(
-            with_grad &&
-            static_cast<MultidimensionalArraysImpl *>(ptr_)->RequiresGrad()),
-        version_(static_cast<MultidimensionalArraysImpl *>(ptr_)->Version()) {
+        with_grad_(with_grad &&
+                   static_cast<MdarrayImpl *>(ptr_)->RequiresGrad()),
+        version_(static_cast<MdarrayImpl *>(ptr_)->Version()) {
     IncrementCounters();
   }
 
-  ExpImplPtr(const MultidimensionalArraysImpl &impl, bool with_grad)
-      : ptr_(const_cast<MultidimensionalArraysImpl *>(&impl)),
-        with_grad_(
-            with_grad &&
-            static_cast<MultidimensionalArraysImpl *>(ptr_)->RequiresGrad()),
-        version_(static_cast<MultidimensionalArraysImpl *>(ptr_)->Version()) {
+  ExpImplPtr(const MdarrayImpl &impl, bool with_grad)
+      : ptr_(const_cast<MdarrayImpl *>(&impl)),
+        with_grad_(with_grad &&
+                   static_cast<MdarrayImpl *>(ptr_)->RequiresGrad()),
+        version_(static_cast<MdarrayImpl *>(ptr_)->Version()) {
     IncrementCounters();
   }
 
   ExpImplPtr(const ExpImplPtr &other, bool with_grad)
       : ptr_(other.ptr_),
-        with_grad_(
-            with_grad &&
-            static_cast<MultidimensionalArraysImpl *>(ptr_)->RequiresGrad()),
-        version_(static_cast<MultidimensionalArraysImpl *>(ptr_)->Version()) {
+        with_grad_(with_grad &&
+                   static_cast<MdarrayImpl *>(ptr_)->RequiresGrad()),
+        version_(static_cast<MdarrayImpl *>(ptr_)->Version()) {
     IncrementCounters();
   }
 
   ~ExpImplPtr() { DecreaseRefcount(); }
 
-  MultidimensionalArraysImpl *operator->() const {
-    return static_cast<MultidimensionalArraysImpl *>(ptr_);
-  }
+  MdarrayImpl *operator->() const { return static_cast<MdarrayImpl *>(ptr_); }
 
-  const MultidimensionalArraysImpl &operator*() const {
-    return *static_cast<MultidimensionalArraysImpl *>(ptr_);
+  const MdarrayImpl &operator*() const {
+    return *static_cast<MdarrayImpl *>(ptr_);
   }
 
   explicit operator bool() const { return ptr_ != nullptr; }
 
   template <typename GradImplType>
   void InvokeBackward(const GradImplType &grad) {
-    MultidimensionalArraysImpl *ptr =
-        static_cast<MultidimensionalArraysImpl *>(ptr_);
+    MdarrayImpl *ptr = static_cast<MdarrayImpl *>(ptr_);
     if (ptr->RequiresGrad()) {
       CHECK_EQUAL(version_, ptr->Version(),
                   "Leaf variable has been moved into the graph interior");
@@ -220,8 +206,7 @@ class ExpImplPtr<MultidimensionalArraysImpl> {
   }
 
   void InvokeBackward() {
-    MultidimensionalArraysImpl *ptr =
-        static_cast<MultidimensionalArraysImpl *>(ptr_);
+    MdarrayImpl *ptr = static_cast<MdarrayImpl *>(ptr_);
     if (ptr->RequiresGrad()) {
       CHECK_EQUAL(version_, ptr->Version(),
                   "Leaf variable has been moved into the graph interior");
@@ -247,10 +232,10 @@ class ExpImplPtr<MultidimensionalArraysImpl> {
     }
   }
 
-  ExpImpl<MultidimensionalArraysImpl> *ptr_;
+  ExpImpl<MdarrayImpl> *ptr_;
   bool with_grad_;
   Index version_;
-  Allocator::DeleteHandler<MultidimensionalArraysImpl> delete_handler_;
+  Allocator::DeleteHandler<MdarrayImpl> delete_handler_;
 };
 }  // namespace KD
 
@@ -263,13 +248,13 @@ struct GradFn {
 
   virtual ~GradFn() = default;
 
-  struct MultidimensionalArraysGradImpl
-      : public GradImpl<MultidimensionalArraysGradImpl> {
+  struct MdarrayGradImpl
+      : public GradImpl<MdarrayGradImpl> {
     const Storage &storage_;
     const Shape &shape_;
     const IndexArray &stride_;
 
-    MultidimensionalArraysGradImpl(const Storage &storage, const Shape &shape,
+    MdarrayGradImpl(const Storage &storage, const Shape &shape,
                                    const IndexArray &stride)
         : storage_(storage), shape_(shape), stride_(stride) {}
 
@@ -300,7 +285,7 @@ class GradFnImpl : public GradFn {
 
   void operator()(const Storage &grad, const Shape &shape,
                   const IndexArray &stride) override {
-    MultidimensionalArraysGradImpl grad_exp_impl(grad, shape, stride);
+    MdarrayGradImpl grad_exp_impl(grad, shape, stride);
     next_exp_.InvokeBackward(grad_exp_impl);
   }
 
@@ -309,9 +294,9 @@ class GradFnImpl : public GradFn {
 };
 
 template <>
-struct GradFnImpl<MultidimensionalArraysImpl> : public GradFn {
+struct GradFnImpl<MdarrayImpl> : public GradFn {
  public:
-  GradFnImpl(const MultidimensionalArraysImpl &impl) : next_exp_(impl, false) {}
+  GradFnImpl(const MdarrayImpl &impl) : next_exp_(impl, false) {}
 
   ~GradFnImpl() override = default;
 
@@ -319,12 +304,12 @@ struct GradFnImpl<MultidimensionalArraysImpl> : public GradFn {
 
   void operator()(const Storage &grad, const Shape &shape,
                   const IndexArray &stride) override {
-    MultidimensionalArraysGradImpl grad_exp_impl(grad, shape, stride);
+    MdarrayGradImpl grad_exp_impl(grad, shape, stride);
     next_exp_.InvokeBackward(grad_exp_impl);
   }
 
  private:
-  ExpImplPtr<MultidimensionalArraysImpl> next_exp_;
+  ExpImplPtr<MdarrayImpl> next_exp_;
 };
 
 struct AutoGradMeta {
@@ -368,14 +353,13 @@ void InplacementAddUncontiguous(Storage &dist_storage, const Shape &dist_shape,
 
 // member template function definition
 template <typename ImplType>
-MultidimensionalArraysImpl::MultidimensionalArraysImpl(const ImplType &impl)
-    : MultidimensionalArraysImpl(impl.Size(), impl.RequiresGrad()) {
+MdarrayImpl::MdarrayImpl(const ImplType &impl)
+    : MdarrayImpl(impl.Size(), impl.RequiresGrad()) {
   this->operator=(impl);
 }
 
 template <typename ImplType>
-MultidimensionalArraysImpl &MultidimensionalArraysImpl::operator=(
-    const ImplType &exp_impl) {
+MdarrayImpl &MdarrayImpl::operator=(const ImplType &exp_impl) {
   CHECK_EXP_SAME_SHAPE(*this, exp_impl);
 
   if (requires_grad_) {
@@ -392,8 +376,7 @@ MultidimensionalArraysImpl &MultidimensionalArraysImpl::operator=(
 }
 
 template <typename ImplType>
-MultidimensionalArraysImpl &MultidimensionalArraysImpl::operator+=(
-    const ImplType &exp_impl) {
+MdarrayImpl &MdarrayImpl::operator+=(const ImplType &exp_impl) {
   CHECK_EXP_SAME_SHAPE(*this, exp_impl);
 
   if (requires_grad_) {
@@ -409,8 +392,7 @@ MultidimensionalArraysImpl &MultidimensionalArraysImpl::operator+=(
   return *this;
 }
 
-inline MultidimensionalArraysImpl &MultidimensionalArraysImpl::operator=(
-    const MultidimensionalArraysImpl &other) {
+inline MdarrayImpl &MdarrayImpl::operator=(const MdarrayImpl &other) {
   CHECK_EXP_SAME_SHAPE(*this, other);
   if (requires_grad_) {
     grad_meta_ptr_->set_grad_fn(other);
@@ -426,7 +408,7 @@ inline MultidimensionalArraysImpl &MultidimensionalArraysImpl::operator=(
 }
 
 template <typename ImplType>
-void MultidimensionalArraysImpl::Backward(const ImplType &grad) {
+void MdarrayImpl::Backward(const ImplType &grad) {
   // If the gradient is from a non-broadcasting operation,
   // shape will be the same to this->shape_;
   // Otherwise, shape will be broadcast.
@@ -439,7 +421,7 @@ void MultidimensionalArraysImpl::Backward(const ImplType &grad) {
   Backward();
 }
 
-inline void MultidimensionalArraysImpl::Backward() {
+inline void MdarrayImpl::Backward() {
   if (bool(grad_meta_ptr_->grad_fn_ptr_) && GradCount() == 0) {
     auto &grad_fn = *(grad_meta_ptr_->grad_fn_ptr_);
     if (grad_meta_ptr_->from_view_) {

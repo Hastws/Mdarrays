@@ -4,17 +4,16 @@
 #include "exp/function.h"
 #include "learning/module.h"
 #include "learning/optimizer.h"
-#include "multidimensional_arrays/multidimensional_arrays.h"
+#include "mdarray/mdarray.h"
 
 class MLP : public KD::Learning::Module {
  public:
   MLP(KD::Index in, KD::Index hidden_1, KD::Index out)
       : linear_1_(in, hidden_1), linear_2_(hidden_1, out) {}
 
-  KD::MultidimensionalArrays Forward(
-      const KD::MultidimensionalArrays &input) override {
-    KD::MultidimensionalArrays x1 = linear_1_.Forward(input);
-    KD::MultidimensionalArrays y = linear_2_.Forward(x1);
+  KD::Mdarray Forward(const KD::Mdarray &input) override {
+    KD::Mdarray x1 = linear_1_.Forward(input);
+    KD::Mdarray y = linear_2_.Forward(x1);
     return y;
   }
 
@@ -75,11 +74,11 @@ int main() {
     for (KD::Index j = 0; j < train_dataset.BatchesSize(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
           train_dataset.GetBatch(j);
-      KD::MultidimensionalArrays input(
-          batch_samples, {n_samples, KD::SourceData::MNIST::Img::n_pixels_});
+      KD::Mdarray input(batch_samples,
+                        {n_samples, KD::SourceData::MNIST::Img::n_pixels_});
 
-      KD::MultidimensionalArrays output = mlp.Forward(input);
-      KD::MultidimensionalArrays loss = criterion.Forward(output, batch_labels);
+      KD::Mdarray output = mlp.Forward(input);
+      KD::Mdarray loss = criterion.Forward(output, batch_labels);
       loss.Backward();
 
       optimizer.Step();
@@ -95,11 +94,10 @@ int main() {
     for (KD::Index j = 0; j < val_dataset.BatchesSize(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
           val_dataset.GetBatch(j);
-      KD::MultidimensionalArrays input(
-          batch_samples, {n_samples, KD::SourceData::MNIST::Img::n_pixels_});
-      KD::MultidimensionalArrays output = mlp.Forward(input);
-      KD::MultidimensionalArrays predict =
-          KD::Operator::CreateOperationArgmax(output, 1);
+      KD::Mdarray input(batch_samples,
+                        {n_samples, KD::SourceData::MNIST::Img::n_pixels_});
+      KD::Mdarray output = mlp.Forward(input);
+      KD::Mdarray predict = KD::Operator::CreateOperationArgmax(output, 1);
 
       for (KD::Index k = 0; k < n_samples; ++k) {
         ++total_samples;

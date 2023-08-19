@@ -46,6 +46,7 @@ using SharedPtr = std::shared_ptr<T>;
 template <typename T>
 static SharedPtr<T> SharedAllocate(MemorySize n_bytes) {
   void *raw_ptr = AllocatorInterface::Allocate(n_bytes);
+
   LOG_MP_INFO("Allocator byte size:[" << n_bytes << "] memory address:["
                                       << raw_ptr << "]");
   return SharedPtr<T>(static_cast<T *>(raw_ptr), DeleteHandler<T>());

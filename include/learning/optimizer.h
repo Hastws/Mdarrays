@@ -15,17 +15,13 @@ class OptimizerBase {
   virtual void Step() = 0;
 
  protected:
-  static Index DataSize(const MultidimensionalArraysImpl &t) {
-    return t.shape_.SpaceSize();
-  }
-  static BasicData *GetStorage(MultidimensionalArraysImpl &t) {
-    return t.storage_.data_ptr_;
-  };
-  static BasicData *GetGrad(MultidimensionalArraysImpl &t) {
+  static Index DataSize(const MdarrayImpl &t) { return t.shape_.SpaceSize(); }
+  static BasicData *GetStorage(MdarrayImpl &t) { return t.storage_.data_ptr_; };
+  static BasicData *GetGrad(MdarrayImpl &t) {
     return t.grad_meta_ptr_->grad_.data_ptr_;
   }
 
-  std::vector<std::reference_wrapper<MultidimensionalArraysImpl>> params_;
+  std::vector<std::reference_wrapper<MdarrayImpl>> params_;
 };
 
 class StochasticGradientDescent : public OptimizerBase {
