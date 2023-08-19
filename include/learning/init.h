@@ -21,9 +21,12 @@ class InitializerBase {
   virtual void Init() const = 0;
 
  protected:
-  Index DataSize() const { return param_.shape_.SpaceSize(); }
+  Index DataSize() const { return param_.Size().SpaceSize(); }
 
-  BasicData *GetStorage() const { return param_.storage_.data_ptr_; }
+  BasicData *GetStorage() const {
+    StorageUniversalAgent storage_universal_agent(param_.GetStorage());
+    return storage_universal_agent.GetStorageData();
+  }
 
   static std::default_random_engine engine_;
   MdarrayImpl &param_;

@@ -8,10 +8,7 @@
 
 namespace KD {
 
-namespace Learning {
-class InitializerBase;
-class OptimizerBase;
-}  // namespace Learning
+class StorageUniversalAgent;
 
 class Storage {
  public:
@@ -34,8 +31,7 @@ class Storage {
   void IncrementVersion() const { ++base_ptr_->version_; }
 
   // friend function
-  friend class Learning::InitializerBase;
-  friend class Learning::OptimizerBase;
+  friend class StorageUniversalAgent;
 
  private:
   struct VersionData {
@@ -46,5 +42,17 @@ class Storage {
   std::shared_ptr<VersionData> base_ptr_;  // base pointer
   BasicData *data_ptr_;                    // SourceData pointer
 };
+
+class StorageUniversalAgent {
+ public:
+  explicit StorageUniversalAgent(const Storage &storage) : storage_(storage) {
+    LOG_MP_INFO("Storage universal agent construct.");
+  }
+  BasicData *GetStorageData() const { return storage_.data_ptr_; }
+
+ private:
+  const Storage &storage_;
+};
+
 }  // namespace KD
 #endif

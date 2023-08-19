@@ -153,7 +153,7 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Slice(Index dim, Index start_idx,
   // new_data_ptr = data_ptr + start_idx * stride_[dim]
   Index offset = stride_[dim] * start_idx;
   Storage storage(storage_, offset);
-  // new_stride is the same as Stride
+  // new_stride is the same as GetStride
   IndexArray stride(stride_);
   // new_shape and shape_ are only different on #dim dimension
   Shape shape(shape_);
@@ -237,7 +237,7 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::View(const Shape &shape) const {
                   << " is invalid for input multidimensional_arrays with Size "
                   << shape_.SpaceSize());
   // new_data_ptr = data_ptr
-  // Just use new shape and adjust Stride.
+  // Just use new shape and adjust GetStride.
   auto ret_ptr =
       Allocator::UniqueConstruct<MdarrayImpl>(storage_, shape, false);
   if (requires_grad_) {

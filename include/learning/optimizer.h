@@ -15,10 +15,18 @@ class OptimizerBase {
   virtual void Step() = 0;
 
  protected:
-  static Index DataSize(const MdarrayImpl &t) { return t.shape_.SpaceSize(); }
-  static BasicData *GetStorage(MdarrayImpl &t) { return t.storage_.data_ptr_; };
-  static BasicData *GetGrad(MdarrayImpl &t) {
-    return t.grad_meta_ptr_->grad_.data_ptr_;
+  static Index DataSize(const MdarrayImpl &mdarray_impl) {
+    return mdarray_impl.Size().SpaceSize();
+  }
+  static BasicData *GetStorage(MdarrayImpl &mdarray_impl) {
+    StorageUniversalAgent storage_universal_agent(mdarray_impl.GetStorage());
+    return storage_universal_agent.GetStorageData();
+  };
+  static BasicData *GetGrad(MdarrayImpl &mdarray_impl) {
+    MdarrayImplUniversalAgent mdarray_impl_universal_agent(mdarray_impl);
+    auto &storage = mdarray_impl_universal_agent.GetGradMetaPtr()->grad_;
+    StorageUniversalAgent storage_universal_agent(storage);
+    return storage_universal_agent.GetStorageData();
   }
 
   std::vector<std::reference_wrapper<MdarrayImpl>> params_;

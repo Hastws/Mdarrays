@@ -16,11 +16,7 @@ namespace KD {
 // forward declaration
 struct AutoGradMeta;
 
-namespace Learning {
-class InitializerBase;
-
-class OptimizerBase;
-}  // namespace Learning
+class MdarrayImplUniversalAgent;
 
 // Multidimensional array
 class MdarrayImpl : public ExpImpl<MdarrayImpl> {
@@ -59,9 +55,11 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
 
   const Shape &Size() const { return shape_; }
 
-  Index Offset() const { return storage_.Offset(); }
+  const IndexArray &GetStride() const { return stride_; }
 
-  const IndexArray &Stride() const { return stride_; }
+  const Storage &GetStorage() const { return storage_; }
+
+  Index Offset() const { return storage_.Offset(); }
 
   Index Version() const { return storage_.Version(); }
 
@@ -107,9 +105,7 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
 
   friend ExpImplPtr<MdarrayImpl>;
 
-  friend class Learning::InitializerBase;
-
-  friend class Learning::OptimizerBase;
+  friend class MdarrayImplUniversalAgent;
 
  private:
   template <typename ImplType>
@@ -123,6 +119,16 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
 
   bool requires_grad_;
   Allocator::UniquePtr<AutoGradMeta> grad_meta_ptr_;
+};
+
+class MdarrayImplUniversalAgent {
+ public:
+  explicit MdarrayImplUniversalAgent(const MdarrayImpl &mdarray_impl)
+      : mdarray_impl_(mdarray_impl) {}
+  AutoGradMeta *GetGradMetaPtr() { return mdarray_impl_.grad_meta_ptr_.get(); }
+
+ private:
+  const MdarrayImpl &mdarray_impl_;
 };
 
 template <typename Stream>

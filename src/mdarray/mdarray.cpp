@@ -39,11 +39,7 @@ Index Mdarray::DimensionsSize() const { return impl_ptr_->DimensionsSize(); }
 
 Index Mdarray::Size(Index idx) const { return impl_ptr_->Size(idx); }
 
-const Shape &Mdarray::Size() const { return impl_ptr_->Size(); }
-
 Index Mdarray::Offset() const { return impl_ptr_->Offset(); }
-
-const IndexArray &Mdarray::Stride() const { return impl_ptr_->Stride(); }
 
 Index Mdarray::Version() const { return impl_ptr_->Version(); }
 

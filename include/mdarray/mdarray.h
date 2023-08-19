@@ -42,11 +42,13 @@ class Mdarray : public Exp<MdarrayImpl> {
 
   Index Size(Index idx) const;
 
-  const Shape &Size() const;
-
   Index Offset() const;
 
-  const IndexArray &Stride() const;
+  const Shape &Size() const { return impl_ptr_->Size(); }
+
+  const Storage &GetStorage() const { return impl_ptr_->GetStorage(); }
+
+  const IndexArray &GetStride() const { return impl_ptr_->GetStride(); }
 
   Index Version() const;
 

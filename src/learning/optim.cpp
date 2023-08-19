@@ -22,7 +22,7 @@ OptimizerBase::OptimizerBase(const ParamsDict &params_dict) {
 void OptimizerBase::ZeroGrad() {
   for (MdarrayImpl &t : params_) {
     BasicData *grad_data_ptr = GetGrad(t);
-    std::memset(grad_data_ptr, 0, t.shape_.SpaceSize() * sizeof(BasicData));
+    std::memset(grad_data_ptr, 0, t.Size().SpaceSize() * sizeof(BasicData));
   }
 }
 
