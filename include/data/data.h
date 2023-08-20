@@ -23,14 +23,14 @@ class DatasetBase {
 class MNIST : public DatasetBase {
  public:
   struct Img {
-    static constexpr Index n_rows_ = 28;
-    static constexpr Index n_cols_ = 28;
-    static constexpr Index n_pixels_ = n_rows_ * n_cols_;
-    BasicData pixels_[n_pixels_];
+    static constexpr Index rows_size_ = 28;
+    static constexpr Index cols_size_ = 28;
+    static constexpr Index pixels_size_ = rows_size_ * cols_size_;
+    BasicData pixels_data_[pixels_size_];
   };
 
   MNIST(const std::string &img_path, const std::string &label_path,
-        Index batch_size, bool shuffle);
+        Index batch_size);
 
   Index SamplesSize() const override { return samples_size_.size(); }
   Index BatchesSize() const override { return batches_size_; }
@@ -53,21 +53,21 @@ class MNIST : public DatasetBase {
 class Cifar10 : public DatasetBase {
  public:
   struct Img {
-    static constexpr Index n_channels_ = 3;
-    static constexpr Index n_rows_ = 32;
-    static constexpr Index n_cols_ = 32;
-    static constexpr Index n_pixels_ = n_channels_ * n_rows_ * n_cols_;
+    static constexpr Index channels_size_ = 3;
+    static constexpr Index rows_size_ = 32;
+    static constexpr Index cols_size_ = 32;
+    static constexpr Index pixels_size_ =
+        channels_size_ * rows_size_ * cols_size_;
 
-    static constexpr Index n_train_samples_ = 50000;
-    static constexpr Index n_test_samples_ = 10000;
+    static constexpr Index train_samples_size_ = 50000;
+    static constexpr Index test_samples_size_ = 10000;
 
-    BasicData data_[n_pixels_];
+    BasicData pixels_data_[pixels_size_];
   };
 
-  Cifar10(const std::string &dataset_dir, bool train, Index batch_size,
-          bool shuffle, char path_sep = '\\');
-  Index SamplesSize() const override { return imgs_.size(); }
-  Index BatchesSize() const override { return n_batchs_; }
+  Cifar10(const std::string &dataset_dir, bool train, Index batch_size);
+  Index SamplesSize() const override { return samples_size_.size(); }
+  Index BatchesSize() const override { return batches_size_; }
 
   std::pair<const BasicData *, Index> GetSample(Index idx) const override;
   std::tuple<Index, const BasicData *, const Index *> GetBatch(
@@ -75,13 +75,12 @@ class Cifar10 : public DatasetBase {
   void Shuffle() override;
 
  private:
-  void ReadCifar10(const std::string &dataset_dir, bool train,
-                   char path_sep = '\\');
+  void ReadCifar10(const std::string &dataset_dir, bool train);
   void ReadBin(const std::string &bin_path);
 
   Index batch_size_;
-  Index n_batchs_;
-  std::vector<Img> imgs_;
+  Index batches_size_;
+  std::vector<Img> samples_size_;
   std::vector<Index> labels_;
 };
 

@@ -40,17 +40,15 @@ int main() {
   steady_clock::time_point start_tp = steady_clock::now();
 
   // dataset
-  KD::SourceData::MNIST train_dataset(
-      std::string(PROJECT_SOURCE_DIR) + "/data/train-images.idx3-ubyte",
-      std::string(PROJECT_SOURCE_DIR) + "/data/train-labels.idx1-ubyte",
-      batch_size, false);
-  KD::SourceData::MNIST val_dataset(
-      std::string(PROJECT_SOURCE_DIR) + "/data/t10k-images.idx3-ubyte",
-      std::string(PROJECT_SOURCE_DIR) + "/data/t10k-labels.idx1-ubyte",
-      batch_size, false);
+  KD::SourceData::MNIST train_dataset(std::string(MLP_MNIST_TRAIN_IMAGES),
+                                      std::string(MLP_MNIST_TRAIN_LABELS),
+                                      batch_size);
+  KD::SourceData::MNIST val_dataset(std::string(MLP_MNIST_TEST_IMAGES),
+                                    std::string(MLP_MNIST_TEST_LABELS),
+                                    batch_size);
 
   // model and criterion
-  MLP mlp(KD::SourceData::MNIST::Img::n_pixels_, 64, 10);
+  MLP mlp(KD::SourceData::MNIST::Img::pixels_size_, 64, 10);
   KD::Learning::CrossEntropy criterion;
 
   // optimizer
@@ -75,7 +73,7 @@ int main() {
       std::tie(n_samples, batch_samples, batch_labels) =
           train_dataset.GetBatch(j);
       KD::Mdarray input(batch_samples,
-                        {n_samples, KD::SourceData::MNIST::Img::n_pixels_});
+                        {n_samples, KD::SourceData::MNIST::Img::pixels_size_});
 
       KD::Mdarray output = mlp.Forward(input);
       KD::Mdarray loss = criterion.Forward(output, batch_labels);
@@ -95,7 +93,7 @@ int main() {
       std::tie(n_samples, batch_samples, batch_labels) =
           val_dataset.GetBatch(j);
       KD::Mdarray input(batch_samples,
-                        {n_samples, KD::SourceData::MNIST::Img::n_pixels_});
+                        {n_samples, KD::SourceData::MNIST::Img::pixels_size_});
       KD::Mdarray output = mlp.Forward(input);
       KD::Mdarray predict = KD::Operator::CreateOperationArgmax(output, 1);
 

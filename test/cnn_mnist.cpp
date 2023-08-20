@@ -7,7 +7,7 @@
 #include "learning/optimizer.h"
 #include "mdarray/mdarray.h"
 
-class SimpleCNN : public KD::Learning::Module {
+class CNN : public KD::Learning::Module {
  public:
   KD::Mdarray Forward(const KD::Mdarray &input) override {
     KD::Mdarray conv_0 = conv_0_.Forward(input);
@@ -54,17 +54,15 @@ int main() {
   steady_clock::time_point start_tp = steady_clock::now();
 
   // dataset
-  KD::SourceData::MNIST train_dataset(
-      std::string(PROJECT_SOURCE_DIR) + "/data/train-images.idx3-ubyte",
-      std::string(PROJECT_SOURCE_DIR) + "/data/train-labels.idx1-ubyte",
-      batch_size, false);
-  KD::SourceData::MNIST val_dataset(
-      std::string(PROJECT_SOURCE_DIR) + "/data/t10k-images.idx3-ubyte",
-      std::string(PROJECT_SOURCE_DIR) + "/data/t10k-labels.idx1-ubyte",
-      batch_size, false);
+  KD::SourceData::MNIST train_dataset(std::string(MLP_MNIST_TRAIN_IMAGES),
+                                      std::string(MLP_MNIST_TRAIN_LABELS),
+                                      batch_size);
+  KD::SourceData::MNIST val_dataset(std::string(MLP_MNIST_TEST_IMAGES),
+                                    std::string(MLP_MNIST_TEST_LABELS),
+                                    batch_size);
 
   // model and criterion
-  SimpleCNN simple_cnn;
+  CNN simple_cnn;
   KD::Learning::CrossEntropy criterion;
 
   // optimizer
@@ -75,15 +73,14 @@ int main() {
   const KD::BasicData *batch_samples;
   const KD::Index *batch_labels;
   for (KD::Index i = 0; i < epoch; ++i) {
-    std::cout << "Epoch " << i << " training..." << std::endl;
-    std::cout << "total iterators: " << train_dataset.BatchesSize()
-              << std::endl;
+    LOG_MDA_INFO("Epoch [" << i << "] training...")
+    LOG_MDA_INFO("Total iterators: " << train_dataset.BatchesSize());
     train_dataset.Shuffle();
 
     if (i == lr_decay_epoch1 || i == lr_decay_epoch2) {
       KD::BasicData optimizer_lr = optimizer.Lr();
       optimizer.SetLr(optimizer_lr * lr_decay_factor);
-      std::cout << "Lr decay to " << optimizer.Lr() << std::endl;
+      LOG_MDA_INFO("Lr decay to [" << optimizer.Lr() << "]")
     }
 
     for (KD::Index j = 0; j < train_dataset.BatchesSize(); ++j) {
@@ -99,12 +96,11 @@ int main() {
       optimizer.ZeroGrad();
 
       if (j % print_iterators == 0) {
-        std::cout << "iter " << j << " | ";
-        std::cout << "loss: " << loss.Item() << std::endl;
+        LOG_MDA_INFO("iter [" << j << "] loss: [" << loss.Item() << "]");
       }
     }
 
-    std::cout << "Epoch " << i << " Evaluating..." << std::endl;
+    LOG_MDA_INFO("Epoch [" << i << "] evaluating...")
     KD::Index total_samples = 0, correct_samples = 0;
     for (KD::Index j = 0; j < val_dataset.BatchesSize(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
@@ -119,17 +115,16 @@ int main() {
         if (pd_label == batch_labels[k]) ++correct_samples;
       }
     }
-    std::cout << "total samples: " << total_samples;
-    std::cout << " | correct samples: " << correct_samples;
-    std::cout << " | acc: ";
-    std::cout << static_cast<KD::BasicData>(correct_samples) / total_samples
-              << std::endl;
+    LOG_MDA_INFO("total samples: ["
+                 << total_samples << "] correct samples: [" << correct_samples
+                 << "] acc: ["
+                 << static_cast<KD::BasicData>(correct_samples) / total_samples)
   }
 
   steady_clock::time_point end_tp = steady_clock::now();
   duration<double> time_span =
       duration_cast<duration<double>>(end_tp - start_tp);
-  std::cout << "Training finished. Training took " << time_span.count();
-  std::cout << " seconds." << std::endl;
+  LOG_MDA_INFO("Training finished training took " << time_span.count()
+                                                   << " seconds.");
   return 0;
 }

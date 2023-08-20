@@ -21,7 +21,7 @@ OptimizerBase::OptimizerBase(const ParamsDict &params_dict) {
 
 void OptimizerBase::ZeroGrad() {
   for (MdarrayImpl &t : params_) {
-    BasicData *grad_data_ptr = GetGrad(t);
+    BasicData *grad_data_ptr = GetGradData(t);
     std::memset(grad_data_ptr, 0, t.Size().SpaceSize() * sizeof(BasicData));
   }
 }
@@ -32,9 +32,9 @@ StochasticGradientDescent::StochasticGradientDescent(
 
 void StochasticGradientDescent::Step() {
   for (MdarrayImpl &t : params_) {
-    BasicData *storage_data_ptr = GetStorage(t);
-    BasicData *grad_data_ptr = GetGrad(t);
-    Index data_size = DataSize(t);
+    BasicData *storage_data_ptr = GetStorageData(t);
+    BasicData *grad_data_ptr = GetGradData(t);
+    Index data_size = GetDataSize(t);
 
     for (Index i = 0; i < data_size; ++i) {
       storage_data_ptr[i] -= lr_ * grad_data_ptr[i];
@@ -50,7 +50,7 @@ StochasticGradientDescentWithMomentum::StochasticGradientDescentWithMomentum(
       first_step_(true) {
   running_means_.reserve(params_.size());
   for (MdarrayImpl &t : params_) {
-    Index n_bytes = sizeof(BasicData) * DataSize(t);
+    Index n_bytes = sizeof(BasicData) * GetDataSize(t);
     running_means_.emplace_back(Allocator::UniqueAllocate<BasicData>(n_bytes));
   }
 }
@@ -60,10 +60,10 @@ void StochasticGradientDescentWithMomentum::Step() {
     first_step_ = false;
     for (Index i = 0; i < params_.size(); ++i) {
       MdarrayImpl &t = params_[i];
-      BasicData *storage_data_ptr = GetStorage(t);
-      BasicData *grad_data_ptr = GetGrad(t);
+      BasicData *storage_data_ptr = GetStorageData(t);
+      BasicData *grad_data_ptr = GetGradData(t);
       BasicData *vx = running_means_[i].get();
-      Index data_size = DataSize(t);
+      Index data_size = GetDataSize(t);
 
       std::memcpy(vx, grad_data_ptr, data_size * sizeof(BasicData));
       for (Index j = 0; j < data_size; ++j) {
@@ -73,10 +73,10 @@ void StochasticGradientDescentWithMomentum::Step() {
   } else {
     for (Index i = 0; i < params_.size(); ++i) {
       MdarrayImpl &t = params_[i];
-      BasicData *storage_data_ptr = GetStorage(t);
-      BasicData *grad_data_ptr = GetGrad(t);
+      BasicData *storage_data_ptr = GetStorageData(t);
+      BasicData *grad_data_ptr = GetGradData(t);
       BasicData *vx = running_means_[i].get();
-      Index data_size = DataSize(t);
+      Index data_size = GetDataSize(t);
 
       for (Index j = 0; j < data_size; ++j) {
         vx[j] = momentum_ * vx[j] + grad_data_ptr[j];

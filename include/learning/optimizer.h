@@ -15,14 +15,14 @@ class OptimizerBase {
   virtual void Step() = 0;
 
  protected:
-  static Index DataSize(const MdarrayImpl &mdarray_impl) {
+  static Index GetDataSize(const MdarrayImpl &mdarray_impl) {
     return mdarray_impl.Size().SpaceSize();
   }
-  static BasicData *GetStorage(MdarrayImpl &mdarray_impl) {
+  static BasicData *GetStorageData(MdarrayImpl &mdarray_impl) {
     StorageUniversalAgent storage_universal_agent(mdarray_impl.GetStorage());
     return storage_universal_agent.GetStorageData();
   };
-  static BasicData *GetGrad(MdarrayImpl &mdarray_impl) {
+  static BasicData *GetGradData(MdarrayImpl &mdarray_impl) {
     MdarrayImplUniversalAgent mdarray_impl_universal_agent(mdarray_impl);
     auto &storage = mdarray_impl_universal_agent.GetGradMetaPtr()->grad_;
     StorageUniversalAgent storage_universal_agent(storage);
