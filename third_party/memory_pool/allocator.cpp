@@ -5,6 +5,30 @@
 #include <cstdlib>
 #include <iostream>
 
+// #define OUT_PUT_MEMORY_POOL_LOG
+
+#ifdef OUT_PUT_MEMORY_POOL_LOG
+#define LOG_MP_INFO(x)                                                  \
+  std::cout << std::setprecision(15) << "[INFO] [" << __FILE__ << "] [" \
+            << __func__ << "] [" << __LINE__ << "] " << x << std::endl;
+#define LOG_MP_ERROR(x)                                                  \
+  std::cout << std::setprecision(15) << "[ERROR] [" << __FILE__ << "] [" \
+            << __func__ << "] [" << __LINE__ << "] " << x << std::endl;
+#define LOG_MP_WARNING(x)                                                  \
+  std::cout << std::setprecision(15) << "[WARNING] [" << __FILE__ << "] [" \
+            << __func__ << "] [" << __LINE__ << "] " << x << std::endl;
+#else
+#define LOG_MP_INFO(x)
+#define LOG_MP_ERROR(x)
+#define LOG_MP_WARNING(x)
+#endif
+
+#define LOG_MP_FATAL(x)                                                  \
+  std::cout << std::setprecision(15) << "[FATAL] [" << __FILE__ << "] [" \
+            << __func__ << "] [" << __LINE__ << "] " << x << std::endl;
+
+#undef OUT_PUT_MEMORY_POOL_LOG
+
 #define BLOCK_SIZE sizeof(struct Block)
 #define BLOCK_POINTER_SIZE sizeof(struct Block *)
 
@@ -152,7 +176,7 @@ class FirstFitAllocator {
     if (mp_size > max_mp_size) {
       return nullptr;
     }
-    MemoryPool *mp = (MemoryPool *)malloc(sizeof(MemoryPool));
+    auto *mp = (MemoryPool *)malloc(sizeof(MemoryPool));
     if (!mp) {
       return nullptr;
     }
@@ -432,13 +456,12 @@ static bool is_memory_pool_inited = false;
 void *AllocatorInterface::Allocate(MemorySize n_bytes) {
   if (!is_memory_pool_inited) {
     LOG_MP_INFO("Process Init memory pool");
-    memory_pool = FirstFitAllocator::MemoryPoolInit(1024 * MB, 512 * MB, 0);
+    memory_pool = FirstFitAllocator::MemoryPoolInit(2048 * MB, 1024 * MB, 0);
     is_memory_pool_inited = true;
   }
   void *p = FirstFitAllocator::MemoryPoolAlloc(memory_pool, n_bytes);
   if (!p) {
-    LOG_MP_INFO("Memory return nullptr.")
-    exit(0);
+    LOG_MP_FATAL("Memory return nullptr.")
   }
   return p;
 }
@@ -449,12 +472,3 @@ void AllocatorInterface::Deallocate(void *ptr) {
 
 }  // namespace Allocator
 }  // namespace KD
-
-#undef BLOCK_SIZE
-#undef BLOCK_POINTER_SIZE
-#undef MP_LOCK
-#undef MP_UNLOCK
-#undef MP_ALIGN_SIZE
-#undef MP_INIT_MEMORY_STRUCT
-#undef MP_DLINKLIST_INS_FRT
-#undef MP_DLINKLIST_DEL

@@ -5,6 +5,7 @@
 
 #include "memory_pool/allocator.h"
 #include "utils/base_config.h"
+#include "utils/log.h"
 
 namespace KD {
 
@@ -45,9 +46,7 @@ class Storage {
 
 class StorageUniversalAgent {
  public:
-  explicit StorageUniversalAgent(const Storage &storage) : storage_(storage) {
-    LOG_MP_INFO("Storage universal agent construct.");
-  }
+  explicit StorageUniversalAgent(const Storage &storage) : storage_(storage) {}
   BasicData *GetStorageData() const { return storage_.data_ptr_; }
 
  private:
