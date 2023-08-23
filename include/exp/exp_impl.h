@@ -12,7 +12,7 @@
 #include "exp/operator/nll_loss.h"
 #include "exp/operator/reduce_op.h"
 #include "memory_pool/allocator.h"
-#include "utils/array.h"
+#include "utils/fixed_array.h"
 #include "utils/base_config.h"
 
 namespace KD {

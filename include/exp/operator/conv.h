@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "utils/array.h"
+#include "utils/fixed_array.h"
 #include "utils/base_config.h"
 namespace KD {
 namespace Operator {

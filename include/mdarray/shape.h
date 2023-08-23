@@ -5,8 +5,8 @@
 #include <ostream>
 
 #include "memory_pool/allocator.h"
-#include "utils/array.h"
 #include "utils/base_config.h"
+#include "utils/fixed_array.h"
 
 namespace KD {
 

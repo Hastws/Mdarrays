@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <type_traits>
 
-#include "utils/array.h"
+#include "utils/fixed_array.h"
 #include "utils/base_config.h"
 
 namespace KD {

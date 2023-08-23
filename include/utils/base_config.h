@@ -9,9 +9,10 @@ using Index = unsigned int;
 using BasicData = double;
 
 template <typename DataType>
-class DynamicArray;
+class FixedArray;
 
-using IndexArray = DynamicArray<Index>;
+using IndexArray = FixedArray<Index>;
+constexpr Index FixedArraySize = 8;
 
 constexpr Index INDEX_MAX = std::numeric_limits<Index>::max() >> 1;
 constexpr Index INDEX_MIN = 0;
