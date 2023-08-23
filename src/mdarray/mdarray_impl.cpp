@@ -132,8 +132,8 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Slice(Index dim,
     ret_ptr->requires_grad_ = true;
     ret_ptr->grad_meta_ptr_ =
         Allocator::UniqueConstruct<AutoGradMeta>(grad_meta_ptr_->grad_, offset);
-    ret_ptr->grad_meta_ptr_->set_from_view(true);
-    ret_ptr->grad_meta_ptr_->set_grad_fn(*this);
+    ret_ptr->grad_meta_ptr_->SetFromView(true);
+    ret_ptr->grad_meta_ptr_->SetGradFn(*this);
   }
   return ret_ptr;
 }
@@ -165,8 +165,8 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Slice(Index dim, Index start_idx,
     ret_ptr->requires_grad_ = true;
     ret_ptr->grad_meta_ptr_ =
         Allocator::UniqueConstruct<AutoGradMeta>(grad_meta_ptr_->grad_, offset);
-    ret_ptr->grad_meta_ptr_->set_from_view(true);
-    ret_ptr->grad_meta_ptr_->set_grad_fn(*this);
+    ret_ptr->grad_meta_ptr_->SetFromView(true);
+    ret_ptr->grad_meta_ptr_->SetGradFn(*this);
   }
   return ret_ptr;
 }
@@ -196,8 +196,8 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Transpose(Index dim1,
     ret_ptr->requires_grad_ = true;
     ret_ptr->grad_meta_ptr_ =
         Allocator::UniqueConstruct<AutoGradMeta>(grad_meta_ptr_->grad_, 0);
-    ret_ptr->grad_meta_ptr_->set_from_view(true);
-    ret_ptr->grad_meta_ptr_->set_grad_fn(*this);
+    ret_ptr->grad_meta_ptr_->SetFromView(true);
+    ret_ptr->grad_meta_ptr_->SetGradFn(*this);
   }
   return ret_ptr;
 }
@@ -222,8 +222,8 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Permute(
     ret_ptr->requires_grad_ = true;
     ret_ptr->grad_meta_ptr_ =
         Allocator::UniqueConstruct<AutoGradMeta>(grad_meta_ptr_->grad_, 0);
-    ret_ptr->grad_meta_ptr_->set_from_view(true);
-    ret_ptr->grad_meta_ptr_->set_grad_fn(*this);
+    ret_ptr->grad_meta_ptr_->SetFromView(true);
+    ret_ptr->grad_meta_ptr_->SetGradFn(*this);
   }
   return ret_ptr;
 }
@@ -244,8 +244,8 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::View(const Shape &shape) const {
     ret_ptr->requires_grad_ = true;
     ret_ptr->grad_meta_ptr_ =
         Allocator::UniqueConstruct<AutoGradMeta>(grad_meta_ptr_->grad_, 0);
-    ret_ptr->grad_meta_ptr_->set_from_view(true);
-    ret_ptr->grad_meta_ptr_->set_grad_fn(*this);
+    ret_ptr->grad_meta_ptr_->SetFromView(true);
+    ret_ptr->grad_meta_ptr_->SetGradFn(*this);
   }
   return ret_ptr;
 }

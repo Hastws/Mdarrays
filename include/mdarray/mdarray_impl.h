@@ -330,10 +330,10 @@ struct AutoGradMeta {
   AutoGradMeta(const Storage &grad, Index offset)
       : grad_(grad, offset), from_view_(false), grad_fn_ptr_(nullptr) {}
 
-  void set_from_view(bool from_view) { from_view_ = from_view; }
+  void SetFromView(bool from_view) { from_view_ = from_view; }
 
   template <typename ImplType>
-  void set_grad_fn(const ImplType &impl) {
+  void SetGradFn(const ImplType &impl) {
     auto ptr = Allocator::SharedConstruct<GradFnImpl<ImplType>>(impl);
     grad_fn_ptr_ = ptr;
   }
@@ -368,8 +368,8 @@ MdarrayImpl &MdarrayImpl::operator=(const ImplType &exp_impl) {
   CHECK_EXP_SAME_SHAPE(*this, exp_impl);
 
   if (requires_grad_) {
-    grad_meta_ptr_->set_grad_fn(exp_impl);
-    grad_meta_ptr_->set_from_view(false);
+    grad_meta_ptr_->SetGradFn(exp_impl);
+    grad_meta_ptr_->SetFromView(false);
     storage_.IncrementVersion();
   }
 
@@ -385,8 +385,8 @@ MdarrayImpl &MdarrayImpl::operator+=(const ImplType &exp_impl) {
   CHECK_EXP_SAME_SHAPE(*this, exp_impl);
 
   if (requires_grad_) {
-    grad_meta_ptr_->set_grad_fn(exp_impl);
-    grad_meta_ptr_->set_from_view(false);
+    grad_meta_ptr_->SetGradFn(exp_impl);
+    grad_meta_ptr_->SetFromView(false);
     storage_.IncrementVersion();
   }
 
@@ -400,8 +400,8 @@ MdarrayImpl &MdarrayImpl::operator+=(const ImplType &exp_impl) {
 inline MdarrayImpl &MdarrayImpl::operator=(const MdarrayImpl &other) {
   CHECK_EXP_SAME_SHAPE(*this, other);
   if (requires_grad_) {
-    grad_meta_ptr_->set_grad_fn(other);
-    grad_meta_ptr_->set_from_view(false);
+    grad_meta_ptr_->SetGradFn(other);
+    grad_meta_ptr_->SetFromView(false);
     storage_.IncrementVersion();
   }
 
