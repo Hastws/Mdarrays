@@ -1,6 +1,5 @@
 #include "mdarray/mdarray_impl.h"
 
-#include <iostream>
 #include <utility>
 
 #include "memory_pool/allocator.h"
