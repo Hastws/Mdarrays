@@ -24,9 +24,6 @@ class ExpImpl;
 template <typename T>
 class ExpImplPtr;
 
-template <typename T>
-using OperandImplPtr = ExpImplPtr<T>;
-
 template <typename OperatorType, typename OIType>
 class UnaryExpImpl;
 
@@ -121,7 +118,7 @@ class UnaryExpImpl : public ExpImpl<UnaryExpImpl<OperatorType, OIType>> {
   using Operator = OperatorType;
   using operand_type = OIType;
 
-  explicit UnaryExpImpl(const OperandImplPtr<OIType> &ptr)
+  explicit UnaryExpImpl(const ExpImplPtr<OIType> &ptr)
       : operand_ptr_(ptr, true) {}
 
   Index DimensionsSize() const {
@@ -153,7 +150,7 @@ class UnaryExpImpl : public ExpImpl<UnaryExpImpl<OperatorType, OIType>> {
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
 };
 
 template <typename OperatorType, typename LhsImplType, typename RhsImplType>
@@ -164,8 +161,8 @@ class BinaryExpImpl
   using lhs_type = LhsImplType;
   using rhs_type = RhsImplType;
 
-  BinaryExpImpl(const OperandImplPtr<LhsImplType> &lhs_ptr,
-                const OperandImplPtr<RhsImplType> &rhs_ptr)
+  BinaryExpImpl(const ExpImplPtr<LhsImplType> &lhs_ptr,
+                const ExpImplPtr<RhsImplType> &rhs_ptr)
       : lhs_ptr_(lhs_ptr, true), rhs_ptr_(rhs_ptr, true) {}
 
   Index DimensionsSize() const {
@@ -208,8 +205,8 @@ class BinaryExpImpl
   }
 
  private:
-  OperandImplPtr<LhsImplType> lhs_ptr_;
-  OperandImplPtr<RhsImplType> rhs_ptr_;
+  ExpImplPtr<LhsImplType> lhs_ptr_;
+  ExpImplPtr<RhsImplType> rhs_ptr_;
 };
 }  // namespace KD
 
@@ -222,7 +219,7 @@ class UnaryExpImpl<Operator::LogSoftmax, OIType>
   using Operator = Operator::LogSoftmax;
   using operand_type = OIType;
 
-  explicit UnaryExpImpl(const OperandImplPtr<OIType> &ptr)
+  explicit UnaryExpImpl(const ExpImplPtr<OIType> &ptr)
       : operand_ptr_(ptr, true),
         n_batch_(operand_ptr_->Size(0)),
         batch_sum_exp_(Allocator::UniqueAllocate<BasicData>(
@@ -266,7 +263,7 @@ class UnaryExpImpl<Operator::LogSoftmax, OIType>
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
   Index n_batch_;
   Allocator::UniquePtr<BasicData> batch_sum_exp_;
   Allocator::UniquePtr<BasicData> batch_max_cls_;
@@ -279,7 +276,7 @@ class UnaryExpImpl<Operator::Mean, OIType>
   using Operator = Operator::Mean;
   using operand_type = OIType;
 
-  explicit UnaryExpImpl(const OperandImplPtr<OIType> &ptr, Index reduce_dim)
+  explicit UnaryExpImpl(const ExpImplPtr<OIType> &ptr, Index reduce_dim)
       : operand_ptr_(ptr, true), reduce_dim_(reduce_dim) {}
 
   Index DimensionsSize() const {
@@ -312,7 +309,7 @@ class UnaryExpImpl<Operator::Mean, OIType>
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
   Index reduce_dim_;
 };
 
@@ -323,7 +320,7 @@ class UnaryExpImpl<Operator::Max, OIType>
   using Operator = Operator::Max;
   using operand_type = OIType;
 
-  explicit UnaryExpImpl(const OperandImplPtr<OIType> &ptr, Index reduce_dim)
+  explicit UnaryExpImpl(const ExpImplPtr<OIType> &ptr, Index reduce_dim)
       : operand_ptr_(ptr, true), reduce_dim_(reduce_dim) {}
 
   Index DimensionsSize() const {
@@ -358,7 +355,7 @@ class UnaryExpImpl<Operator::Max, OIType>
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
   Index reduce_dim_;
 };
 
@@ -369,7 +366,7 @@ class UnaryExpImpl<Operator::Argmax, OIType>
   using Operator = Operator::Argmax;
   using operand_type = OIType;
 
-  explicit UnaryExpImpl(const OperandImplPtr<OIType> &ptr, Index reduce_dim)
+  explicit UnaryExpImpl(const ExpImplPtr<OIType> &ptr, Index reduce_dim)
       : operand_ptr_(ptr, true), reduce_dim_(reduce_dim) {}
 
   Index DimensionsSize() const {
@@ -400,7 +397,7 @@ class UnaryExpImpl<Operator::Argmax, OIType>
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
   Index reduce_dim_;
 };
 
@@ -411,7 +408,7 @@ class UnaryExpImpl<Operator::NLLLoss, OIType>
   using Operator = Operator::NLLLoss;
   using operand_type = OIType;
 
-  explicit UnaryExpImpl(const OperandImplPtr<OIType> &ptr,
+  explicit UnaryExpImpl(const ExpImplPtr<OIType> &ptr,
                         const std::shared_ptr<Index> &batch_label)
       : operand_ptr_(ptr, true), batch_label_(batch_label) {}
 
@@ -447,7 +444,7 @@ class UnaryExpImpl<Operator::NLLLoss, OIType>
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
   std::shared_ptr<Index> batch_label_;
 };
 
@@ -458,7 +455,7 @@ class UnaryExpImpl<Operator::Img2col, OIType>
   using Operator = Operator::Img2col;
   using operand_type = OIType;
 
-  UnaryExpImpl(const OperandImplPtr<OIType> &ptr,
+  UnaryExpImpl(const ExpImplPtr<OIType> &ptr,
                Operator::Img2col::MatrixSize kernel_size,
                Operator::Img2col::MatrixSize stride_size,
                Operator::Img2col::MatrixSize padding_size)
@@ -517,7 +514,7 @@ class UnaryExpImpl<Operator::Img2col, OIType>
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
   Operator::Img2col::MatrixSize kernel_size_;
   Operator::Img2col::MatrixSize stride_size_;
   Operator::Img2col::MatrixSize padding_size_;
@@ -532,7 +529,7 @@ class UnaryExpImpl<Operator::MaxPool2d, OIType>
   using Operator = Operator::MaxPool2d;
   using operand_type = OIType;
 
-  UnaryExpImpl(const OperandImplPtr<OIType> &ptr,
+  UnaryExpImpl(const ExpImplPtr<OIType> &ptr,
                Operator::MaxPool2d::MatrixSize kernel_size,
                Operator::MaxPool2d::MatrixSize stride_size,
                Operator::MaxPool2d::MatrixSize padding_size)
@@ -579,7 +576,7 @@ class UnaryExpImpl<Operator::MaxPool2d, OIType>
   }
 
  private:
-  OperandImplPtr<OIType> operand_ptr_;
+  ExpImplPtr<OIType> operand_ptr_;
   Operator::MaxPool2d::MatrixSize kernel_size_;
   Operator::MaxPool2d::MatrixSize stride_size_;
   Operator::MaxPool2d::MatrixSize padding_size_;
