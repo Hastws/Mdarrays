@@ -14,9 +14,9 @@ class StorageUniversalAgent;
 
 class Storage {
  public:
-  explicit Storage(Index Size)
+  explicit Storage(Index size)
       : base_ptr_(Allocator::SharedAllocate<VersionData>(
-            Size * sizeof(BasicData) + sizeof(Index))),
+            size * sizeof(BasicData) + sizeof(Index))),
         data_ptr_(base_ptr_->data_) {
     base_ptr_->version_ = 0;
   }
@@ -24,12 +24,12 @@ class Storage {
   Storage(const Storage &other, Index offset)
       : base_ptr_(other.base_ptr_), data_ptr_(other.data_ptr_ + offset) {}
 
-  Storage(Index Size, BasicData value) : Storage(Size) {
-    std::memset(data_ptr_, static_cast<int>(value), Size * sizeof(BasicData));
+  Storage(Index size, BasicData value) : Storage(size) {
+    std::memset(data_ptr_, static_cast<int>(value), size * sizeof(BasicData));
   }
 
-  Storage(const BasicData *data, Index Size) : Storage(Size) {
-    std::memcpy(data_ptr_, data, Size * sizeof(BasicData));
+  Storage(const BasicData *data, Index size) : Storage(size) {
+    std::memcpy(data_ptr_, data, size * sizeof(BasicData));
   }
 
   Storage(const Storage &other) = default;
