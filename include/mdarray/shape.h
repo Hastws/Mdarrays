@@ -65,9 +65,6 @@ class Shape {
 
   explicit operator const IndexArray &() const { return dims_; }
 
-  template <typename Stream>
-  friend Stream &operator<<(Stream &stream, const Shape &s);
-
  private:
   IndexArray dims_;
 };
