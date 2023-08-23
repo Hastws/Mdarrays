@@ -44,8 +44,6 @@ class FixedArray {
     }
   }
 
-  ~FixedArray() = default;
-
   DataType &operator[](Index idx) { return array_[idx]; }
 
   DataType operator[](Index idx) const { return array_[idx]; }
