@@ -13,7 +13,6 @@
 
 namespace KD {
 
-// forward declaration
 struct AutoGradMeta;
 
 class MdarrayImplUniversalAgent;
@@ -27,20 +26,56 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
 
   // constructor
   MdarrayImpl(const Storage &storage, const Shape &shape,
-              const IndexArray &stride, bool requires_grad = false);
+              const IndexArray &stride, bool requires_grad = false)
+      : storage_(storage),
+        shape_(shape),
+        stride_(stride),
+        requires_grad_(requires_grad),
+        grad_meta_ptr_(nullptr) {
+    if (requires_grad_) {
+      grad_meta_ptr_ = Allocator::UniqueConstruct<AutoGradMeta>(shape_);
+    }
+  }
 
-  MdarrayImpl(Storage storage, Shape shape, bool requires_grad = false);
+  MdarrayImpl(Storage storage, Shape shape, bool requires_grad = false)
+      : storage_(std::move(storage)),
+        shape_(std::move(shape)),
+        stride_(shape_.DimensionsSize()),
+        requires_grad_(requires_grad),
+        grad_meta_ptr_(nullptr) {
+    // if shape_[i] == 1, set stride_[i] = 0. For broadcasting operation.
+    for (KD::Index i = 0; i < stride_.ArraySize(); ++i) {
+      stride_[i] = shape_[i] == 1 ? 0 : shape_.SubSpaceSize(i + 1);
+    }
+    if (requires_grad_) {
+      grad_meta_ptr_ = Allocator::UniqueConstruct<AutoGradMeta>(shape_);
+    }
+  }
+
+  explicit MdarrayImpl(const Shape &shape, bool requires_grad = false)
+      : MdarrayImpl(Storage(shape.SpaceSize()), shape, requires_grad) {}
 
   MdarrayImpl(const BasicData *data, const Shape &shape,
-              bool requires_grad = false);
-
-  explicit MdarrayImpl(const Shape &shape, bool requires_grad = false);
+              bool requires_grad = false)
+      : MdarrayImpl(Storage(data, shape.SpaceSize()), shape, requires_grad) {}
 
   MdarrayImpl(Storage &&storage, Shape &&shape, IndexArray &&stride,
-              bool requires_grad = false);
+              bool requires_grad = false)
+      : storage_(std::move(storage)),
+        shape_(std::move(shape)),
+        stride_(std::move(stride)),
+        requires_grad_(requires_grad),
+        grad_meta_ptr_(nullptr) {
+    if (requires_grad_) {
+      grad_meta_ptr_ = Allocator::UniqueConstruct<AutoGradMeta>(shape_);
+    }
+  }
 
   template <typename ImplType>
-  MdarrayImpl(const ImplType &impl);
+  MdarrayImpl(const ImplType &impl)
+      : MdarrayImpl(impl.Size(), impl.RequiresGrad()) {
+    this->operator=(impl);
+  }
 
   MdarrayImpl(const MdarrayImpl &other) = delete;
 
@@ -48,7 +83,6 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
 
   MdarrayImpl &operator=(const MdarrayImpl &other);
 
-  // inline function
   Index DimensionsSize() const { return shape_.DimensionsSize(); }
 
   Index Size(Index idx) const { return shape_[idx]; }
@@ -66,15 +100,54 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
   bool RequiresGrad() const { return requires_grad_; }
 
   // other method
-  bool IsContiguous() const;
+  bool IsContiguous() const {
+    for (Index i = 0; i < stride_.ArraySize(); i++) {
+      if (stride_[i] != 0 && stride_[i] != shape_.SubSpaceSize(i + 1)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   Allocator::UniquePtr<MdarrayImpl> Grad() const;
 
-  BasicData &operator[](std::initializer_list<Index> indexes);
+  BasicData &operator[](std::initializer_list<Index> indexes) {
+    CHECK_EQUAL(DimensionsSize(), indexes.size(),
+                "Invalid " << indexes.size() << " indices for "
+                           << DimensionsSize() << " multidimensional_arrays")
 
-  BasicData operator[](std::initializer_list<Index> indexes) const;
+    Index offset = 0, i = 0;
+    for (auto idx : indexes) {
+      CHECK_IN_RANGE(idx, 0, Size(i),
+                     "Index " << idx << " is out of bound for dimension " << i
+                              << " with Size " << Size(i))
+      offset += idx * stride_[i++];
+    }
+    storage_.IncrementVersion();
+    return storage_[offset];
+  }
 
-  BasicData Item() const;
+  BasicData operator[](std::initializer_list<Index> indexes) const {
+    CHECK_EQUAL(DimensionsSize(), indexes.size(),
+                "Invalid " << indexes.size() << " indices for "
+                           << DimensionsSize() << " multidimensional_arrays")
+
+    Index offset = 0, i = 0;
+    for (auto idx : indexes) {
+      CHECK_IN_RANGE(idx, 0, Size(i),
+                     "Index " << idx << " is out of bound for dimension " << i
+                              << " with Size " << Size(i))
+      offset += idx * stride_[i++];
+    }
+    return storage_[offset];
+  }
+
+  BasicData Item() const {
+    CHECK_TRUE(
+        DimensionsSize() == 1 && Size(0) == 1,
+        "Only one element multidimensional_arrays can be converted to scalars");
+    return storage_[0];
+  }
 
   Allocator::UniquePtr<MdarrayImpl> Slice(Index dim, Index idx) const;
 
@@ -207,7 +280,7 @@ class ExpImplPtr<MdarrayImpl> {
     MdarrayImpl *ptr = static_cast<MdarrayImpl *>(ptr_);
     if (ptr->RequiresGrad()) {
       CHECK_EQUAL(version_, ptr->Version(),
-                  "Leaf variable has been moved into the graph interior");
+                  "Leaf variable has been moved into the graph interior")
       if (with_grad_) {
         ptr->DecreaseGradCount();
       }
@@ -219,7 +292,7 @@ class ExpImplPtr<MdarrayImpl> {
     MdarrayImpl *ptr = static_cast<MdarrayImpl *>(ptr_);
     if (ptr->RequiresGrad()) {
       CHECK_EQUAL(version_, ptr->Version(),
-                  "Leaf variable has been moved into the graph interior");
+                  "Leaf variable has been moved into the graph interior")
       if (with_grad_) {
         ptr->DecreaseGradCount();
       }
@@ -284,7 +357,7 @@ struct GradFn {
 template <typename ImplType>
 class GradFnImpl : public GradFn {
  public:
-  GradFnImpl(const ImplType &impl) : next_exp_(impl, false) {}
+  explicit GradFnImpl(const ImplType &impl) : next_exp_(impl, false) {}
 
   ~GradFnImpl() override = default;
 
@@ -305,7 +378,7 @@ class GradFnImpl : public GradFn {
 template <>
 struct GradFnImpl<MdarrayImpl> : public GradFn {
  public:
-  GradFnImpl(const MdarrayImpl &impl) : next_exp_(impl, false) {}
+  explicit GradFnImpl(const MdarrayImpl &impl) : next_exp_(impl, false) {}
 
   ~GradFnImpl() override = default;
 
@@ -326,10 +399,8 @@ struct AutoGradMeta {
   bool from_view_;
   std::shared_ptr<GradFn> grad_fn_ptr_;
 
-  AutoGradMeta(const Shape &multidimensional_arrays_shape)
-      : grad_(multidimensional_arrays_shape.SpaceSize(), 0),
-        from_view_(false),
-        grad_fn_ptr_(nullptr) {}
+  explicit AutoGradMeta(const Shape &shape)
+      : grad_(shape.SpaceSize(), 0), from_view_(false), grad_fn_ptr_(nullptr) {}
 
   AutoGradMeta(const Storage &grad, Index offset)
       : grad_(grad, offset), from_view_(false), grad_fn_ptr_(nullptr) {}
@@ -342,7 +413,6 @@ struct AutoGradMeta {
     grad_fn_ptr_ = ptr;
   }
 };
-
 
 template <typename ImplType>
 void Assign(Storage &dist_storage, const Shape &dist_shape,
@@ -440,16 +510,9 @@ void InplacementAddUncontiguous(Storage &dist_storage, const Shape &dist_shape,
   }
 }
 
-// member template function definition
-template <typename ImplType>
-MdarrayImpl::MdarrayImpl(const ImplType &impl)
-    : MdarrayImpl(impl.Size(), impl.RequiresGrad()) {
-  this->operator=(impl);
-}
-
 template <typename ImplType>
 MdarrayImpl &MdarrayImpl::operator=(const ImplType &exp_impl) {
-  CHECK_EXP_SAME_SHAPE(*this, exp_impl);
+  CHECK_EXP_SAME_SHAPE(*this, exp_impl)
 
   if (requires_grad_) {
     grad_meta_ptr_->SetGradFn(exp_impl);
@@ -466,7 +529,7 @@ MdarrayImpl &MdarrayImpl::operator=(const ImplType &exp_impl) {
 
 template <typename ImplType>
 MdarrayImpl &MdarrayImpl::operator+=(const ImplType &exp_impl) {
-  CHECK_EXP_SAME_SHAPE(*this, exp_impl);
+  CHECK_EXP_SAME_SHAPE(*this, exp_impl)
 
   if (requires_grad_) {
     grad_meta_ptr_->SetGradFn(exp_impl);
@@ -482,7 +545,7 @@ MdarrayImpl &MdarrayImpl::operator+=(const ImplType &exp_impl) {
 }
 
 inline MdarrayImpl &MdarrayImpl::operator=(const MdarrayImpl &other) {
-  CHECK_EXP_SAME_SHAPE(*this, other);
+  CHECK_EXP_SAME_SHAPE(*this, other)
   if (requires_grad_) {
     grad_meta_ptr_->SetGradFn(other);
     grad_meta_ptr_->SetFromView(false);

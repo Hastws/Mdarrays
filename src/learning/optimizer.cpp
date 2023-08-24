@@ -14,7 +14,7 @@ OptimizerBase::OptimizerBase(const ParamsDict &params_dict) {
     Mdarray &ma = named_param_ref.second.get();
     auto &impl = const_cast<MdarrayImpl &>(ma.Impl());
     CHECK_TRUE(impl.IsContiguous(),
-               "Only contiguous Mdarray can be optimized.");
+               "Only contiguous Mdarray can be optimized.")
     params_.emplace_back(impl);
   }
 }
