@@ -74,7 +74,7 @@ int main() {
   const KD::Index *batch_labels;
   for (KD::Index i = 0; i < epoch; ++i) {
     LOG_MDA_INFO("Epoch [" << i << "] training...")
-    LOG_MDA_INFO("Total iterators: " << train_dataset.BatchesSize());
+    LOG_MDA_INFO("Total iterators: " << train_dataset.BatchesSize())
     train_dataset.Shuffle();
 
     if (i == lr_decay_epoch1 || i == lr_decay_epoch2) {
@@ -96,7 +96,7 @@ int main() {
       optimizer.ZeroGrad();
 
       if (j % print_iterators == 0) {
-        LOG_MDA_INFO("iter [" << j << "] loss: [" << loss.Item() << "]");
+        LOG_MDA_INFO("iter [" << j << "] loss: [" << loss.Item() << "]")
       }
     }
 
@@ -125,6 +125,6 @@ int main() {
   duration<double> time_span =
       duration_cast<duration<double>>(end_tp - start_tp);
   LOG_MDA_INFO("Training finished training took " << time_span.count()
-                                                   << " seconds.");
+                                                   << " seconds.")
   return 0;
 }

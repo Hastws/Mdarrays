@@ -91,7 +91,7 @@ int main() {
     if (i == lr_decay_epoch1 || i == lr_decay_epoch2) {
       KD::BasicData optimizer_lr = optimizer.Lr();
       optimizer.SetLr(optimizer_lr * lr_decay_factor);
-      LOG_MDA_INFO("Lr decay to [" << optimizer.Lr() << "] ");
+      LOG_MDA_INFO("Lr decay to [" << optimizer.Lr() << "] ")
     }
 
     for (KD::Index j = 0; j < train_dataset.BatchesSize(); ++j) {
@@ -115,7 +115,7 @@ int main() {
       }
     }
 
-    LOG_MDA_INFO("Epoch [" << i << "] evaluating...");
+    LOG_MDA_INFO("Epoch [" << i << "] evaluating...")
     KD::Index total_samples = 0, correct_samples = 0;
     for (KD::Index j = 0; j < val_dataset.BatchesSize(); ++j) {
       std::tie(samples_size, batch_samples, batch_labels) =
@@ -145,6 +145,6 @@ int main() {
   duration<double> time_span =
       duration_cast<duration<double>>(end_tp - start_tp);
   LOG_MDA_INFO("Training finished. Training took " << time_span.count()
-                                                   << " seconds.");
+                                                   << " seconds.")
   return 0;
 }

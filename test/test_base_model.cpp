@@ -6,7 +6,6 @@
 #include "learning/optimizer.h"
 #include "mdarray/mdarray.h"
 #include "mdarray/shape.h"
-#include "mdarray/storage.h"
 #include "utils/exception.h"
 
 void TestMdarray();
@@ -78,7 +77,7 @@ void TestMdarray() {
   for (KD::Index i = 0, idx = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value = mda_1[{i, j}];
-      CHECK_FLOAT_EQUAL(value, data[idx], "Check basic index.");
+      CHECK_FLOAT_EQUAL(value, data[idx], "Check basic index.")
       idx++;
     }
   }
@@ -92,7 +91,7 @@ void TestMdarray() {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::BasicData value1 = mda_1[{j, i}];
       KD::BasicData value2 = mda_2[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "Check transpose.");
+      CHECK_FLOAT_EQUAL(value1, value2, "Check transpose.")
     }
   }
   // [[1, 5, 9],
@@ -103,12 +102,12 @@ void TestMdarray() {
 
   auto mda_3 = mda_2.Slice(1, 1, 3);
   auto shape_t3 = mda_3.Size();
-  CHECK_TRUE(shape_t3[0] == 4 && shape_t3[1] == 2, "Check slice.");
+  CHECK_TRUE(shape_t3[0] == 4 && shape_t3[1] == 2, "Check slice.")
   for (KD::Index i = 0; i < 4; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
       KD::BasicData value1 = mda_2[{i, j + 1}];
       KD::BasicData value2 = mda_3[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "Check slice.");
+      CHECK_FLOAT_EQUAL(value1, value2, "Check slice.")
     }
   }
 
@@ -125,7 +124,7 @@ void TestMdarray() {
       for (KD::Index k = 0; k < 2; ++k) {
         KD::BasicData value1 = mda_1[{i, j * 2 + k}];
         KD::BasicData value2 = mda_4[{i, j, k}];
-        CHECK_FLOAT_EQUAL(value1, value2, "Check view.");
+        CHECK_FLOAT_EQUAL(value1, value2, "Check view.")
       }
     }
   }
@@ -138,16 +137,16 @@ void TestMdarray() {
   LOG_MDA_INFO(mda_4)
 
   auto mda_5 = mda_4.Unsqueeze(0).Unsqueeze(2);
-  CHECK_EQUAL(mda_5.DimensionsSize(), 5, "Check unsqueeze.");
+  CHECK_EQUAL(mda_5.DimensionsSize(), 5, "Check unsqueeze.")
   KD::Shape shape_t5({1, 3, 1, 2, 2});
   for (KD::Index i = 0; i < 5; ++i)
-    CHECK_EQUAL(mda_5.Size(i), shape_t5[i], "Check unsqueeze.");
+    CHECK_EQUAL(mda_5.Size(i), shape_t5[i], "Check unsqueeze.")
   for (KD::Index i = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
       for (KD::Index k = 0; k < 2; ++k) {
         KD::BasicData value1 = mda_4[{i, j, k}];
         KD::BasicData value2 = mda_5[{0, i, 0, j, k}];
-        CHECK_FLOAT_EQUAL(value1, value2, "Check unsqueeze.");
+        CHECK_FLOAT_EQUAL(value1, value2, "Check unsqueeze.")
       }
     }
   }
@@ -159,13 +158,13 @@ void TestMdarray() {
   LOG_MDA_INFO(mda_5)
 
   auto mda_6 = mda_5.Squeeze();
-  CHECK_EQUAL(mda_6.DimensionsSize(), mda_4.DimensionsSize(), "Check squeeze.");
+  CHECK_EQUAL(mda_6.DimensionsSize(), mda_4.DimensionsSize(), "Check squeeze.")
   for (KD::Index i = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
       for (KD::Index k = 0; k < 2; ++k) {
         KD::BasicData value1 = mda_4[{i, j, k}];
         KD::BasicData value2 = mda_6[{i, j, k}];
-        CHECK_FLOAT_EQUAL(value1, value2, "Check squeeze.");
+        CHECK_FLOAT_EQUAL(value1, value2, "Check squeeze.")
       }
     }
   }
@@ -175,16 +174,16 @@ void TestMdarray() {
   LOG_MDA_INFO(mda_6)
 
   auto mda_7 = mda_5.Permute({0, 2, 3, 4, 1});
-  CHECK_EQUAL(mda_7.DimensionsSize(), 5, "Check permute.");
+  CHECK_EQUAL(mda_7.DimensionsSize(), 5, "Check permute.")
   KD::Shape shape_t7({1, 1, 2, 2, 3});
   for (KD::Index i = 0; i < 5; ++i)
-    CHECK_EQUAL(mda_7.Size(i), shape_t7[i], "Check permute.");
+    CHECK_EQUAL(mda_7.Size(i), shape_t7[i], "Check permute.")
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
       for (KD::Index k = 0; k < 3; ++k) {
         KD::BasicData value1 = mda_7[{0, 0, i, j, k}];
         KD::BasicData value2 = mda_5[{0, k, 0, i, j}];
-        CHECK_FLOAT_EQUAL(value1, value2, "Check permute.");
+        CHECK_FLOAT_EQUAL(value1, value2, "Check permute.")
       }
     }
   }
@@ -212,7 +211,7 @@ void TestBasicOperator() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_3[{i, j}];
       KD::BasicData value2 = 2 * mda_1[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check 1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check 1")
     }
   }
 
@@ -234,7 +233,7 @@ void TestBasicOperator() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_3[{i, j}];
       KD::BasicData value2 = 3 * mda_1[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check 2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check 2")
     }
   }
   // [[3, 6, 9, 12],
@@ -247,7 +246,7 @@ void TestBasicOperator() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_4[{i, j}];
       KD::BasicData value2 = mda_1[{i, j}] * mda_2[{i, j}] + mda_3[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check 3");
+      CHECK_FLOAT_EQUAL(value1, value2, "check 3")
     }
   }
   // [[4, 10, 18, 28],
@@ -271,7 +270,7 @@ void TestBasicOperator() {
       KD::BasicData value2 = mda_3[{i, j}] * mda_4[{i, j}] -
                              (mda_1[{i, j}] + mda_2[{i, j}]) -
                              (-mda_1[{i, j}] * mda_2[{i, j}]);
-      CHECK_FLOAT_EQUAL(value1, value2, "check 3");
+      CHECK_FLOAT_EQUAL(value1, value2, "check 3")
     }
   }
   // [[11, 60, 165, 344],
@@ -310,7 +309,7 @@ void TestBasicOperator() {
                 mda_6[{i, 0, 0, l, m}] + mda_7[{i, j, 0, 0, m}];
             value2 -= mda_6[{i, 0, 0, l, m}] * mda_8[{i, j, k}];
             value2 += mda_6[{i, 0, 0, l, m}] - mda_8[{i, j, k}];
-            CHECK_FLOAT_EQUAL(value1, value2, "check 3");
+            CHECK_FLOAT_EQUAL(value1, value2, "check 3")
           }
         }
       }
@@ -341,7 +340,7 @@ void TestBasicOperator() {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::BasicData value1 = mda_10[{i, j}];
       KD::BasicData value2 = mda_1[{j, i}] + 1;
-      CHECK_FLOAT_EQUAL(value1, value2, "check5");
+      CHECK_FLOAT_EQUAL(value1, value2, "check5")
     }
   }
   // [[2, 6, 10],
@@ -362,7 +361,7 @@ void TestBasicOperator() {
       KD::BasicData value1 = mda_11[{i, j}];
       KD::BasicData value2 = mda_12[{i, j}];
       KD::BasicData value3 = mda_13[{i, j}];
-      CHECK_TRUE(value1 == value2 && value1 == value3, "check6");
+      CHECK_TRUE(value1 == value2 && value1 == value3, "check6")
     }
   }
   // [[1, 2, 3],
@@ -399,7 +398,7 @@ void TestMatrixOperator() {
     for (KD::Index j = 0; j < 2; ++j) {
       KD::BasicData value1 = mda_3[{i, j}];
       KD::BasicData value2 = t3_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check 1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check 1")
     }
   }
   // [[931, 2227],[2191, 5647]]
@@ -421,7 +420,7 @@ void TestMatrixOperator() {
       for (KD::Index k = 0; k < 2; ++k) {
         KD::BasicData value1 = mda_6[{i, j, k}];
         KD::BasicData value2 = t6_expect[i][j][k];
-        CHECK_FLOAT_EQUAL(value1, value2, "check 2");
+        CHECK_FLOAT_EQUAL(value1, value2, "check 2")
       }
     }
   }
@@ -430,14 +429,14 @@ void TestMatrixOperator() {
   LOG_MDA_INFO(mda_6)
 
   KD::Mdarray mda_7 = KD::Operator::CreateOperationMatrixTranspose(mda_1);
-  CHECK_EQUAL(mda_7.DimensionsSize(), 2, "check3");
-  CHECK_EQUAL(mda_7.Size(0), 6, "check3");
-  CHECK_EQUAL(mda_7.Size(1), 2, "check3");
+  CHECK_EQUAL(mda_7.DimensionsSize(), 2, "check3")
+  CHECK_EQUAL(mda_7.Size(0), 6, "check3")
+  CHECK_EQUAL(mda_7.Size(1), 2, "check3")
   for (KD::Index i = 0; i < 6; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
       KD::BasicData value1 = mda_1[{j, i}];
       KD::BasicData value2 = mda_7[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check 3");
+      CHECK_FLOAT_EQUAL(value1, value2, "check 3")
     }
   }
   // [[1, 7],[2, 8],[3, 9],[4, 10],[5, 11],[6, 12]]
@@ -448,16 +447,16 @@ void TestMatrixOperator() {
   LOG_MDA_INFO(mda_8)
 
   KD::Mdarray mda_9 = KD::Operator::CreateOperationBatchMatrixTranspose(mda_8);
-  CHECK_EQUAL(mda_9.DimensionsSize(), 3, "check4");
-  CHECK_EQUAL(mda_9.Size(0), 2, "check4");
-  CHECK_EQUAL(mda_9.Size(1), 3, "check4");
-  CHECK_EQUAL(mda_9.Size(2), 2, "check4");
+  CHECK_EQUAL(mda_9.DimensionsSize(), 3, "check4")
+  CHECK_EQUAL(mda_9.Size(0), 2, "check4")
+  CHECK_EQUAL(mda_9.Size(1), 3, "check4")
+  CHECK_EQUAL(mda_9.Size(2), 2, "check4")
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 3; ++j) {
       for (KD::Index k = 0; k < 2; ++k) {
         KD::BasicData value1 = mda_8[{i, k, j}];
         KD::BasicData value2 = mda_9[{i, j, k}];
-        CHECK_FLOAT_EQUAL(value1, value2, "check 3");
+        CHECK_FLOAT_EQUAL(value1, value2, "check 3")
       }
     }
   }
@@ -483,7 +482,7 @@ void TestNumericOperator() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = mda_2[{i, j}];
       KD::BasicData value2 = t1_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
   }
   // [[-1.20896482874321, -1.18197582874321, -1.55311882874321,
@@ -500,11 +499,11 @@ void TestNumericOperator() {
   // The value of the corresponding position
   labels[0] = 2, labels[1] = 0, labels[2] = 3;
   KD::Mdarray mda_3 = KD::Operator::CreateOperationNllLoss(mda_2, labels_ptr);
-  CHECK_EQUAL(mda_3.DimensionsSize(), 1, "check2");
-  CHECK_EQUAL(mda_3.Size(0), mda_2.Size(0), "check2");
-  CHECK_FLOAT_EQUAL(mda_3[{0}], -t1_expect[0][2], "check2");
-  CHECK_FLOAT_EQUAL(mda_3[{1}], -t1_expect[1][0], "check2");
-  CHECK_FLOAT_EQUAL(mda_3[{2}], -t1_expect[2][3], "check2");
+  CHECK_EQUAL(mda_3.DimensionsSize(), 1, "check2")
+  CHECK_EQUAL(mda_3.Size(0), mda_2.Size(0), "check2")
+  CHECK_FLOAT_EQUAL(mda_3[{0}], -t1_expect[0][2], "check2")
+  CHECK_FLOAT_EQUAL(mda_3[{1}], -t1_expect[1][0], "check2")
+  CHECK_FLOAT_EQUAL(mda_3[{2}], -t1_expect[2][3], "check2")
   // [1.55311882874321, 1.86005323576525, 1.23903866041312]
   LOG_MDA_INFO(mda_3)
 
@@ -524,12 +523,12 @@ void TestNumericOperator() {
                                   {0.518813, 0.591467, 0.539914}};
   CHECK_TRUE(
       mda_5.DimensionsSize() == 2 && mda_5.Size(0) == 2 && mda_5.Size(1) == 3,
-      "check3");
+      "check3")
   for (KD::Index i = 0; i < 2; ++i) {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::BasicData value1 = mda_5[{i, j}];
       KD::BasicData value2 = t4_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check4");
+      CHECK_FLOAT_EQUAL(value1, value2, "check4")
     }
   }
   // [[0.552694042632973, 0.515264862011877,
@@ -539,8 +538,8 @@ void TestNumericOperator() {
 
   KD::Mdarray mda_6 = KD::Operator::CreateOperationMean(
       KD::Operator::CreateOperationMean(mda_5, 0), 0);
-  CHECK_TRUE(mda_6.DimensionsSize() == 1 && mda_6.Size(0) == 1, "check5");
-  CHECK_FLOAT_EQUAL(mda_6.Item(), 0.536944, "check5");
+  CHECK_TRUE(mda_6.DimensionsSize() == 1 && mda_6.Size(0) == 1, "check5")
+  CHECK_FLOAT_EQUAL(mda_6.Item(), 0.536944, "check5")
   // [0.536943800791578]
   LOG_MDA_INFO(mda_6)
 
@@ -550,7 +549,7 @@ void TestNumericOperator() {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::Index value1 = static_cast<KD::Index>(mda_7[{i, j}]);
       KD::Index value2 = t6_expect[i][j];
-      CHECK_EQUAL(value1, value2, "check6");
+      CHECK_EQUAL(value1, value2, "check6")
     }
   }
   // [[1, 1, 0],[0, 0, 0]]
@@ -561,7 +560,7 @@ void TestNumericOperator() {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::BasicData value1 = mda_8[{i, j}];
       KD::BasicData value2 = mda_4[{i, t6_expect[i][j], j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check7");
+      CHECK_FLOAT_EQUAL(value1, value2, "check7")
     }
   }
   // [[0.328307, 0.122271, 0.028076],[0.150791, 0.421008, 0.322066]]
@@ -593,14 +592,14 @@ void TestConvOperator() {
                                    {0.2132, 0.8020, 0.8020, 0.9874, 0.9874},
                                    {0.8543, 0.8543, 0.8020, 0.7816, 0.7816},
                                    {0.8543, 0.8543, 0.5178, 0.7816, 0.7816}};
-  CHECK_EQUAL(dma_1.DimensionsSize(), 4, "check1");
+  CHECK_EQUAL(dma_1.DimensionsSize(), 4, "check1")
   for (KD::Index i = 0; i < 4; ++i)
-    CHECK_EQUAL(dma_1.Size(i), t1_size_expect[i], "check1");
+    CHECK_EQUAL(dma_1.Size(i), t1_size_expect[i], "check1")
   for (KD::Index i = 0; i < 7; ++i) {
     for (KD::Index j = 0; j < 5; ++j) {
       KD::BasicData value1 = dma_1[{0, 0, i, j}];
       KD::BasicData value2 = t1_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check2")
     }
   }
   // [[[[0.4279, 0.7488, 0.7488, 0.5433, 0.5433],
@@ -617,14 +616,14 @@ void TestConvOperator() {
   KD::Index t2_size_expect[] = {1, 1, 3, 2};
   KD::BasicData t2_expect[][2] = {
       {0.9640, 0.9457}, {0.9640, 0.9874}, {0.8543, 0.9874}};
-  CHECK_EQUAL(dma_2.DimensionsSize(), 4, "check3");
+  CHECK_EQUAL(dma_2.DimensionsSize(), 4, "check3")
   for (KD::Index i = 0; i < 4; ++i)
-    CHECK_EQUAL(dma_2.Size(i), t2_size_expect[i], "check3");
+    CHECK_EQUAL(dma_2.Size(i), t2_size_expect[i], "check3")
   for (KD::Index i = 0; i < 3; ++i) {
     for (KD::Index j = 0; j < 2; ++j) {
       KD::BasicData value1 = dma_2[{0, 0, i, j}];
       KD::BasicData value2 = t2_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check3");
+      CHECK_FLOAT_EQUAL(value1, value2, "check3")
     }
   }
   // [[[[0.964, 0.9457],[0.964, 0.9874],[0.8543, 0.9874]]]]
@@ -633,8 +632,8 @@ void TestConvOperator() {
   KD::Mdarray mda_3 =
       KD::Operator::CreateOperationImgToCol(dma_0, {4, 4}, {2, 2}, {1, 1});
   KD::Index t3_shape_expect[] = {6, 16};
-  CHECK_EQUAL(mda_3.Size(0), t3_shape_expect[0], "check4");
-  CHECK_EQUAL(mda_3.Size(1), t3_shape_expect[1], "check4");
+  CHECK_EQUAL(mda_3.Size(0), t3_shape_expect[0], "check4")
+  CHECK_EQUAL(mda_3.Size(1), t3_shape_expect[1], "check4")
   KD::BasicData t3_expect[][16] = {
       {0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.4279, 0.7488, 0.3639, 0.0000,
        0.2849, 0.6536, 0.8932, 0.0000, 0.9640, 0.4822, 0.1887},
@@ -652,7 +651,7 @@ void TestConvOperator() {
     for (KD::Index j = 0; j < 16; ++j) {
       KD::BasicData value1 = mda_3[{i, j}];
       KD::BasicData value2 = t3_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check4");
+      CHECK_FLOAT_EQUAL(value1, value2, "check4")
     }
   }
   // [[0, 0, 0, 0, 0, 0.4279, 0.7488, 0.3639, 0, 0.2849, 0.6536, 0.8932, 0,
@@ -737,13 +736,13 @@ void TestConvOperator() {
       {0.3589, 0.5178, 0.7816, 0.0000, 0.0000, 0.0000},
       {0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000},
       {0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000}};
-  CHECK_EQUAL(mda_5.Size(0), 36, "check5");
-  CHECK_EQUAL(mda_5.Size(1), 18, "check5");
+  CHECK_EQUAL(mda_5.Size(0), 36, "check5")
+  CHECK_EQUAL(mda_5.Size(1), 18, "check5")
   for (KD::Index i = 0; i < 36; ++i) {
     for (KD::Index j = 0; j < 18; ++j) {
       KD::BasicData value1 = mda_5[{i, j}];
       KD::BasicData value2 = t5_expect[i / 2][j % 6];
-      CHECK_FLOAT_EQUAL(value1, value2, "check5");
+      CHECK_FLOAT_EQUAL(value1, value2, "check5")
     }
   }
   // [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -828,7 +827,7 @@ void TestMdarrayBackward() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = grad_1[{i, j}];
       KD::BasicData value2 = t0_grad_expect_1[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
   }
   // [[0, 0, 0, 0],[1, 1, 0, 0],[0, 0, 1, 1]]
@@ -858,7 +857,7 @@ void TestMdarrayBackward() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = grad_2[{i, j}];
       KD::BasicData value2 = t0_grad_expect_2[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check2")
     }
   }
   // twice grad result.
@@ -901,8 +900,8 @@ void TestBasicOperatorBackward() {
       KD::BasicData value2 = mda_2_grad[{i, j}];
       KD::BasicData value3 = mda_1_grad_expect[i][j];
       KD::BasicData value4 = mda_2_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value3, "check1");
-      CHECK_FLOAT_EQUAL(value2, value4, "check1");
+      CHECK_FLOAT_EQUAL(value1, value3, "check1")
+      CHECK_FLOAT_EQUAL(value2, value4, "check1")
     }
   }
   // [[-4, -7, -10, -13],[-16, -19, -22, -25],[-28, -31, -34, -37]]
@@ -949,7 +948,7 @@ void TestMatrixOperatorBackward() {
     for (KD::Index j = 6; j < 6; ++j) {
       KD::BasicData value1 = t1_grad[{i, j}];
       KD::BasicData value2 = t2_grad[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
   }
   // [[114, 174, 154, 214, 274, 334],[194, 254, 314, 374, 354, 414]]
@@ -994,7 +993,7 @@ void TestNumericOperatorBackward() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = dma_1_grad[{i, j}];
       KD::BasicData value2 = dma_1_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
   }
   // [[0.298506124508601, 0.306672207835006, -0.788412960049184,
@@ -1033,7 +1032,7 @@ void TestNumericOperatorBackward() {
       for (KD::Index k = 0; k < 3; ++k) {
         KD::BasicData value1 = dma_2_grad[{i, j, k}];
         KD::BasicData value2 = dma_2_grad_expect[i][j][k];
-        CHECK_FLOAT_EQUAL(value1, value2, "check2");
+        CHECK_FLOAT_EQUAL(value1, value2, "check2")
       }
     }
   }
@@ -1112,7 +1111,7 @@ void TestImg2colOperatorBackward() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = dma_1_grad[{0, 0, i, j}];
       KD::BasicData value2 = t0_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
   }
   // [[[[5, 8, 8, 5],[8, 13, 13, 8],[8, 13, 13, 8],[8, 13, 13, 8],[8, 13, 13,
@@ -1160,10 +1159,10 @@ void TestBroadcastingOperatorBackward() {
     for (KD::Index j = 0; j < 4; ++j) {
       KD::BasicData value1 = dma_1_grad[{0, i, j}];
       KD::BasicData value2 = dma_1_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
       value1 = dma_2_grad[{i, 0, j}];
       value2 = dma_2_grad_expect[j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check2")
     }
   }
   // [[[21, 30, 39, 48],[45, 54, 63, 72],[69, 78, 87, 96]]]
@@ -1265,10 +1264,10 @@ void TestBroadcastingOperatorBackward() {
       for (KD::Index k = 0; k < 2; ++k) {
         KD::BasicData value1 = dma_6_grad[{0, i, 0, j, 0, k}];
         KD::BasicData value2 = dma_6_grad_expect[i][j][k];
-        CHECK_FLOAT_EQUAL(value1, value2, "check3");
+        CHECK_FLOAT_EQUAL(value1, value2, "check3")
         value1 = dma_7_grad[{j, 0, i, k, 0, 0}];
         value2 = dma_7_grad_expect[j][i][k];
-        CHECK_FLOAT_EQUAL(value1, value2, "check4");
+        CHECK_FLOAT_EQUAL(value1, value2, "check4")
       }
     }
   }
@@ -1366,7 +1365,7 @@ void TestConv2dModule() {
         for (KD::Index l = 0; l < 5; ++l) {
           KD::BasicData value1 = out[{i, j, k, l}];
           KD::BasicData value2 = out_expect[i][j][k][l];
-          CHECK_FLOAT_EQUAL(value1, value2, "check1");
+          CHECK_FLOAT_EQUAL(value1, value2, "check1")
         }
       }
     }
@@ -1386,7 +1385,7 @@ void TestConv2dModule() {
     for (KD::Index j = 0; j < 12; ++j) {
       KD::BasicData value1 = weight_grad[{i, j}];
       KD::BasicData value2 = weight_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check2")
     }
   }
 }
@@ -1431,7 +1430,7 @@ void TestLinearModule() {
     for (KD::Index j = 0; j < 6; ++j) {
       KD::BasicData value1 = out[{i, j}];
       KD::BasicData value2 = out_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
   }
   KD::BasicData weight_grad_expect[6][5] = {
@@ -1448,7 +1447,7 @@ void TestLinearModule() {
     for (KD::Index j = 0; j < 5; ++j) {
       KD::BasicData value1 = weight_grad[{i, j}];
       KD::BasicData value2 = weight_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check2")
     }
   }
   KD::BasicData bias_grad_expect[6] = {0.098009, -0.908593, 0.000000,
@@ -1459,7 +1458,7 @@ void TestLinearModule() {
   for (KD::Index i = 0; i < 6; ++i) {
     KD::BasicData value1 = bias_grad[{0, i}];
     KD::BasicData value2 = bias_grad_expect[i];
-    CHECK_FLOAT_EQUAL(value1, value2, "check3");
+    CHECK_FLOAT_EQUAL(value1, value2, "check3")
   }
 }
 
@@ -1491,7 +1490,7 @@ void TestMaxPool2dModule() {
     for (KD::Index j = 0; j < 2; ++j) {
       KD::BasicData value1 = out[{i, j}];
       KD::BasicData value2 = output_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
 
   KD::BasicData t0_grad_expect[2][6] = {
@@ -1504,7 +1503,7 @@ void TestMaxPool2dModule() {
     for (KD::Index j = 6; j < 6; ++j) {
       KD::BasicData value1 = t0_grad[{0, i, 0, j}];
       KD::BasicData value2 = t0_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check2")
     }
   }
 
@@ -1518,7 +1517,7 @@ void TestMaxPool2dModule() {
     for (KD::Index j = 0; j < 7; ++j) {
       KD::BasicData value1 = dma_2_grad[{i, 0, j, 0}];
       KD::BasicData value2 = t1_grad_expect[i][j];
-      CHECK_FLOAT_EQUAL(value1, value2, "check3");
+      CHECK_FLOAT_EQUAL(value1, value2, "check3")
     }
   }
 }
@@ -1554,7 +1553,7 @@ void TestCrossEntropyModule() {
   loss.Backward();
 
   KD::BasicData loss_expect = 1.157702;
-  CHECK_FLOAT_EQUAL(loss_expect, loss.Item(), "check1");
+  CHECK_FLOAT_EQUAL(loss_expect, loss.Item(), "check1")
 
   KD::BasicData weight_grad_expect[3][5] = {
       {-0.011948, -0.021014, 0.086070, -0.164264, 0.116384},
@@ -1565,7 +1564,7 @@ void TestCrossEntropyModule() {
     for (KD::Index j = 0; j < 5; ++j) {
       KD::BasicData value1 = weight_grad_expect[i][j];
       KD::BasicData value2 = weight_grad[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check2");
+      CHECK_FLOAT_EQUAL(value1, value2, "check2")
     }
   }
 
@@ -1574,7 +1573,7 @@ void TestCrossEntropyModule() {
   for (KD::Index i = 0; i < 3; ++i) {
     KD::BasicData value1 = bias_grad_expect[i];
     KD::BasicData value2 = bias_grad[{0, i}];
-    CHECK_FLOAT_EQUAL(value1, value2, "check3");
+    CHECK_FLOAT_EQUAL(value1, value2, "check3")
   }
   LOG_MDA_INFO(weight_grad)
   LOG_MDA_INFO(bias_grad)
@@ -1620,11 +1619,11 @@ void TestOptimizer() {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::BasicData value1 = weight_expect1[i][j];
       KD::BasicData value2 = weight[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
     KD::BasicData value1 = bias_expect1[i];
     KD::BasicData value2 = bias[{0, i}];
-    CHECK_FLOAT_EQUAL(value1, value2, "check1");
+    CHECK_FLOAT_EQUAL(value1, value2, "check1")
   }
 
   KD::Mdarray out2 = linear.Forward(input);
@@ -1642,10 +1641,10 @@ void TestOptimizer() {
     for (KD::Index j = 0; j < 3; ++j) {
       KD::BasicData value1 = weight_expect2[i][j];
       KD::BasicData value2 = weight[{i, j}];
-      CHECK_FLOAT_EQUAL(value1, value2, "check1");
+      CHECK_FLOAT_EQUAL(value1, value2, "check1")
     }
     KD::BasicData value1 = bias_expect2[i];
     KD::BasicData value2 = bias[{0, i}];
-    CHECK_FLOAT_EQUAL(value1, value2, "check1");
+    CHECK_FLOAT_EQUAL(value1, value2, "check1")
   }
 }
