@@ -343,103 +343,6 @@ struct AutoGradMeta {
   }
 };
 
-template <typename ImplType>
-void Assign(Storage &dist_storage, const Shape &dist_shape,
-            const IndexArray &dist_stride, const ImplType &src_exp);
-
-template <typename ImplType>
-void InplacementAdd(Storage &dist_storage, const Shape &dist_shape,
-                    const IndexArray &dist_stride, const ImplType &src_exp);
-
-template <typename ImplType>
-void AssignUncontiguous(Storage &dist_storage, const Shape &dist_shape,
-                        const IndexArray &dist_stride, const ImplType &src_exp);
-
-template <typename ImplType>
-void InplacementAddUncontiguous(Storage &dist_storage, const Shape &dist_shape,
-                                const IndexArray &dist_stride,
-                                const ImplType &src_exp);
-
-// member template function definition
-template <typename ImplType>
-MdarrayImpl::MdarrayImpl(const ImplType &impl)
-    : MdarrayImpl(impl.Size(), impl.RequiresGrad()) {
-  this->operator=(impl);
-}
-
-template <typename ImplType>
-MdarrayImpl &MdarrayImpl::operator=(const ImplType &exp_impl) {
-  CHECK_EXP_SAME_SHAPE(*this, exp_impl);
-
-  if (requires_grad_) {
-    grad_meta_ptr_->SetGradFn(exp_impl);
-    grad_meta_ptr_->SetFromView(false);
-    storage_.IncrementVersion();
-  }
-
-  if (IsContiguous())
-    Assign(storage_, shape_, stride_, exp_impl);
-  else
-    AssignUncontiguous(storage_, shape_, stride_, exp_impl);
-  return *this;
-}
-
-template <typename ImplType>
-MdarrayImpl &MdarrayImpl::operator+=(const ImplType &exp_impl) {
-  CHECK_EXP_SAME_SHAPE(*this, exp_impl);
-
-  if (requires_grad_) {
-    grad_meta_ptr_->SetGradFn(exp_impl);
-    grad_meta_ptr_->SetFromView(false);
-    storage_.IncrementVersion();
-  }
-
-  if (IsContiguous())
-    InplacementAdd(storage_, shape_, stride_, exp_impl);
-  else
-    InplacementAddUncontiguous(storage_, shape_, stride_, exp_impl);
-  return *this;
-}
-
-inline MdarrayImpl &MdarrayImpl::operator=(const MdarrayImpl &other) {
-  CHECK_EXP_SAME_SHAPE(*this, other);
-  if (requires_grad_) {
-    grad_meta_ptr_->SetGradFn(other);
-    grad_meta_ptr_->SetFromView(false);
-    storage_.IncrementVersion();
-  }
-
-  if (IsContiguous())
-    Assign(storage_, shape_, stride_, other);
-  else
-    AssignUncontiguous(storage_, shape_, stride_, other);
-  return *this;
-}
-
-template <typename ImplType>
-void MdarrayImpl::Backward(const ImplType &grad) {
-  // If the gradient is from a non-broadcasting operation,
-  // shape will be the same to this->shape_;
-  // Otherwise, shape will be broadcast.
-  Shape shape(grad.GradSize());
-  if (IsContiguous() && shape == shape_) {
-    InplacementAdd(grad_meta_ptr_->grad_, shape, stride_, grad);
-  } else {
-    InplacementAddUncontiguous(grad_meta_ptr_->grad_, shape, stride_, grad);
-  }
-  Backward();
-}
-
-inline void MdarrayImpl::Backward() {
-  if (bool(grad_meta_ptr_->grad_fn_ptr_) && GradCount() == 0) {
-    auto &grad_fn = *(grad_meta_ptr_->grad_fn_ptr_);
-    if (grad_meta_ptr_->from_view_) {
-      grad_fn();
-    } else {
-      grad_fn(grad_meta_ptr_->grad_, shape_, stride_);
-    }
-  }
-}
 
 template <typename ImplType>
 void Assign(Storage &dist_storage, const Shape &dist_shape,
@@ -533,6 +436,87 @@ void InplacementAddUncontiguous(Storage &dist_storage, const Shape &dist_shape,
       indexes[idx] = cur[idx];
       ++cur[idx];
       ++idx;
+    }
+  }
+}
+
+// member template function definition
+template <typename ImplType>
+MdarrayImpl::MdarrayImpl(const ImplType &impl)
+    : MdarrayImpl(impl.Size(), impl.RequiresGrad()) {
+  this->operator=(impl);
+}
+
+template <typename ImplType>
+MdarrayImpl &MdarrayImpl::operator=(const ImplType &exp_impl) {
+  CHECK_EXP_SAME_SHAPE(*this, exp_impl);
+
+  if (requires_grad_) {
+    grad_meta_ptr_->SetGradFn(exp_impl);
+    grad_meta_ptr_->SetFromView(false);
+    storage_.IncrementVersion();
+  }
+
+  if (IsContiguous())
+    Assign(storage_, shape_, stride_, exp_impl);
+  else
+    AssignUncontiguous(storage_, shape_, stride_, exp_impl);
+  return *this;
+}
+
+template <typename ImplType>
+MdarrayImpl &MdarrayImpl::operator+=(const ImplType &exp_impl) {
+  CHECK_EXP_SAME_SHAPE(*this, exp_impl);
+
+  if (requires_grad_) {
+    grad_meta_ptr_->SetGradFn(exp_impl);
+    grad_meta_ptr_->SetFromView(false);
+    storage_.IncrementVersion();
+  }
+
+  if (IsContiguous())
+    InplacementAdd(storage_, shape_, stride_, exp_impl);
+  else
+    InplacementAddUncontiguous(storage_, shape_, stride_, exp_impl);
+  return *this;
+}
+
+inline MdarrayImpl &MdarrayImpl::operator=(const MdarrayImpl &other) {
+  CHECK_EXP_SAME_SHAPE(*this, other);
+  if (requires_grad_) {
+    grad_meta_ptr_->SetGradFn(other);
+    grad_meta_ptr_->SetFromView(false);
+    storage_.IncrementVersion();
+  }
+
+  if (IsContiguous())
+    Assign(storage_, shape_, stride_, other);
+  else
+    AssignUncontiguous(storage_, shape_, stride_, other);
+  return *this;
+}
+
+template <typename ImplType>
+void MdarrayImpl::Backward(const ImplType &grad) {
+  // If the gradient is from a non-broadcasting operation,
+  // shape will be the same to this->shape_;
+  // Otherwise, shape will be broadcast.
+  Shape shape(grad.GradSize());
+  if (IsContiguous() && shape == shape_) {
+    InplacementAdd(grad_meta_ptr_->grad_, shape, stride_, grad);
+  } else {
+    InplacementAddUncontiguous(grad_meta_ptr_->grad_, shape, stride_, grad);
+  }
+  Backward();
+}
+
+inline void MdarrayImpl::Backward() {
+  if (bool(grad_meta_ptr_->grad_fn_ptr_) && GradCount() == 0) {
+    auto &grad_fn = *(grad_meta_ptr_->grad_fn_ptr_);
+    if (grad_meta_ptr_->from_view_) {
+      grad_fn();
+    } else {
+      grad_fn(grad_meta_ptr_->grad_, shape_, stride_);
     }
   }
 }
