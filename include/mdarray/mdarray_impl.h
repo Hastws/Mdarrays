@@ -93,9 +93,13 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
       std::initializer_list<Index> dims) const;
 
   // member function for expression template
-  BasicData Eval(IndexArray &indexes) const;
-
-  BasicData Eval(Index idx) const;
+  BasicData Eval(IndexArray &indexes) const {
+    Index offset = 0;
+    for (KD::Index i = 0; i < DimensionsSize(); ++i) {
+      offset += indexes[i] * stride_[i];
+    }
+    return storage_[offset];
+  }
 
   template <typename ImplType>
   MdarrayImpl &operator=(const ImplType &exp_impl);

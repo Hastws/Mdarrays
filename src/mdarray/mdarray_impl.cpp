@@ -288,14 +288,4 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Grad() const {
                                                  stride_, false);
 }
 
-BasicData MdarrayImpl::Eval(IndexArray &indexes) const {
-  Index offset = 0;
-  for (KD::Index i = 0; i < DimensionsSize(); ++i) {
-    offset += indexes[i] * stride_[i];
-  }
-  return storage_[offset];
-}
-
-BasicData MdarrayImpl::Eval(Index idx) const { return storage_[idx]; }
-
 }  // namespace KD
