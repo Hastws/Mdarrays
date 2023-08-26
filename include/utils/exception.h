@@ -24,7 +24,7 @@ struct Error : public std::exception {
   do {                                 \
     LOG_MDA_ERROR(msg)                 \
     throw ::KD::Error(ERROR_LOCATION); \
-  } while (0)
+  } while (0);
 
 #ifndef NDEBUG
 // base assert macro
@@ -60,7 +60,7 @@ struct Error : public std::exception {
                   "Expect the same Size on the "                              \
                       << i << " dimension, but got " << e1.Size(i) << " and " \
                       << e2.Size(i) << ".");                                  \
-  } while (0)
+  } while (0);
 
 #define CHECK_EXP_BROADCAST(e1_, e2_)                                      \
   do {                                                                     \
@@ -72,7 +72,7 @@ struct Error : public std::exception {
           e1.Size(i) == e2.Size(i) || e1.Size(i) == 1 || e2.Size(i) == 1,  \
           "The Size on " << i << "th dimension, " << e1.Size(i) << " and " \
                          << e2.Size(i) << ", can't be broad casted.");     \
-  } while (0)
+  } while (0);
 
 #else
 

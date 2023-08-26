@@ -1,7 +1,5 @@
 #include "allocator.h"
 
-#include <pthread.h>
-
 #include <cstdlib>
 #include <iostream>
 
@@ -123,7 +121,6 @@ struct MemoryPool {
   MemorySize total_mem_pool_size;
   MemorySize max_mem_pool_size;
   struct Chunk *chunk_list_;
-  pthread_mutex_t lock;
 
   template <typename Stream>
   friend Stream &operator<<(Stream &stream, const MemoryPool &mp) {
@@ -141,18 +138,15 @@ struct MemoryPool {
 class FirstFitAllocator {
  public:
   MemorySize GetMemoryListCount(MemoryPool *mp) {
-    MP_LOCK(mp->is_thread_safe_, mp);
     MemorySize result = 0;
     Chunk *mm = mp->chunk_list_;
     while (mm) {
       result++;
       mm = mm->next_chunk_;
     }
-    MP_UNLOCK(mp->is_thread_safe_, mp);
     return result;
   }
   std::pair<MemorySize, MemorySize> GetMemoryInfo(MemoryPool *mp, Chunk *mm) {
-    MP_LOCK(mp->is_thread_safe_, mp);
     MemorySize free_n = 0;
     MemorySize alloc_n = 0;
     Block *p = mm->free_block_list_;
@@ -165,7 +159,6 @@ class FirstFitAllocator {
       alloc_n++;
       p = p->next_block_;
     }
-    MP_UNLOCK(mp->is_thread_safe_, mp);
     return std::make_pair(free_n, alloc_n);
   }
 
@@ -188,7 +181,6 @@ class FirstFitAllocator {
     mp->max_mem_pool_size = max_mp_size;
     mp->mem_pool_size = mp_size;
     mp->total_mem_pool_size = mp_size;
-    pthread_mutex_init(&mp->lock, nullptr);
     char *s = (char *)malloc(sizeof(Chunk) + sizeof(char) * mp->mem_pool_size);
     if (!s) {
       return nullptr;
@@ -213,7 +205,6 @@ class FirstFitAllocator {
     Block *current_free_block_ = nullptr;
     Block *current_not_free_block_ = nullptr;
 
-    MP_LOCK(mp->is_thread_safe_, mp);
   FIND_FREE_CHUNK:
     current_chunk = mp->chunk_list_;
     while (current_chunk) {
@@ -276,7 +267,6 @@ class FirstFitAllocator {
               (current_not_free_block_->allow_mem_ - BLOCK_SIZE -
                BLOCK_POINTER_SIZE);
 
-          MP_UNLOCK(mp->is_thread_safe_, mp);
           return (void *)((char *)current_not_free_block_ + BLOCK_SIZE);
         }
         current_free_block_ = current_free_block_->next_block_;
@@ -295,7 +285,6 @@ class FirstFitAllocator {
       mp->total_mem_pool_size += add_mem_sz;
       goto FIND_FREE_CHUNK;
     }
-    MP_UNLOCK(mp->is_thread_safe_, mp);
     return nullptr;
   }
 
@@ -303,7 +292,6 @@ class FirstFitAllocator {
     if (p == nullptr || mp == nullptr) {
       return false;
     }
-    MP_LOCK(mp->is_thread_safe_, mp);
     Chunk *chunk = mp->chunk_list_;
     if (mp->is_allow_extend_) {
       chunk = find_memory_list(mp, p);
@@ -328,13 +316,11 @@ class FirstFitAllocator {
     if (!mp) {
       return nullptr;
     }
-    MP_LOCK(mp->is_thread_safe_, mp);
     Chunk *mm = mp->chunk_list_;
     while (mm) {
       MP_INIT_MEMORY_STRUCT(mm, mm->mem_pool_size);
       mm = mm->next_chunk_;
     }
-    MP_UNLOCK(mp->is_thread_safe_, mp);
     return mp;
   }
 
@@ -342,25 +328,20 @@ class FirstFitAllocator {
     if (mp == nullptr) {
       return 1;
     }
-    MP_LOCK(mp->is_thread_safe_, mp);
     Chunk *mm = mp->chunk_list_, *mm1 = nullptr;
     while (mm) {
       mm1 = mm;
       mm = mm->next_chunk_;
       free(mm1);
     }
-    MP_UNLOCK(mp->is_thread_safe_, mp);
-    pthread_mutex_destroy(&mp->lock);
     free(mp);
 
     return 0;
   }
 
   static int MemoryPoolSetThreadSafe(MemoryPool *mp, int thread_safe) {
-    MP_LOCK(mp->is_thread_safe_, mp);
     if (mp->is_thread_safe_) {
       mp->is_thread_safe_ = thread_safe;
-      MP_UNLOCK(1, mp);
     } else {
       mp->is_thread_safe_ = thread_safe;
     }
@@ -422,30 +403,25 @@ class FirstFitAllocator {
     }
 
     *(Block **)((char *)p1 + p1->allow_mem_ - BLOCK_POINTER_SIZE) = p1;
-    MP_UNLOCK(mp->is_thread_safe_, mp);
   }
 
   static MemorySize GetUsedMemory(MemoryPool *mp) {
-    MP_LOCK(mp->is_thread_safe_, mp);
     MemorySize total_alloc = 0;
     Chunk *mm = mp->chunk_list_;
     while (mm) {
       total_alloc += mm->allow_mem_;
       mm = mm->next_chunk_;
     }
-    MP_UNLOCK(mp->is_thread_safe_, mp);
     return total_alloc;
   }
 
   static MemorySize GetProgramMemory(MemoryPool *mp) {
-    MP_LOCK(mp->is_thread_safe_, mp);
     MemorySize total_alloc_program = 0;
     Chunk *mm = mp->chunk_list_;
     while (mm) {
       total_alloc_program += mm->alloc_program_mem_;
       mm = mm->next_chunk_;
     }
-    MP_UNLOCK(mp->is_thread_safe_, mp);
     return total_alloc_program;
   }
 };

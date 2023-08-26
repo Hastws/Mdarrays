@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 project(mdarray)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -fopenmp")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wall -fopenmp")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g")
 
 include_directories(include)
 include_directories(third_party)
@@ -12,8 +12,8 @@ FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 message(${PROJECT_SOURCE_DIR})
 
-add_library(multidimensional_arrays_lib SHARED ${SRC_FILES})
-add_library(memory_pool_lib SHARED ${PROJECT_SOURCE_DIR}/third_party/memory_pool/allocator.h
+add_library(multidimensional_arrays_lib STATIC ${SRC_FILES})
+add_library(memory_pool_lib STATIC ${PROJECT_SOURCE_DIR}/third_party/memory_pool/allocator.h
         ${PROJECT_SOURCE_DIR}/third_party/memory_pool/allocator.cpp)
 if (WIN32)
     message("Current platform windows.")
