@@ -12,8 +12,8 @@
 #include "exp/operator/nll_loss.h"
 #include "exp/operator/reduce_op.h"
 #include "memory_pool/allocator.h"
-#include "utils/fixed_array.h"
 #include "utils/base_config.h"
+#include "utils/fixed_array.h"
 
 namespace KD {
 
@@ -460,9 +460,9 @@ class UnaryExpImpl<Operator::Img2col, OIType>
                Operator::Img2col::MatrixSize stride_size,
                Operator::Img2col::MatrixSize padding_size)
       : operand_ptr_(ptr, true),
-        kernel_size_(std::move(kernel_size)),
-        stride_size_(std::move(stride_size)),
-        padding_size_(std::move(padding_size)) {
+        kernel_size_(kernel_size),
+        stride_size_(stride_size),
+        padding_size_(padding_size) {
     Index b = operand_ptr_->Size(0);
     Index c = operand_ptr_->Size(1);
     Index h = operand_ptr_->Size(2);
@@ -534,9 +534,9 @@ class UnaryExpImpl<Operator::MaxPool2d, OIType>
                Operator::MaxPool2d::MatrixSize stride_size,
                Operator::MaxPool2d::MatrixSize padding_size)
       : operand_ptr_(ptr, true),
-        kernel_size_(std::move(kernel_size)),
-        stride_size_(std::move(stride_size)),
-        padding_size_(std::move(padding_size)) {
+        kernel_size_(kernel_size),
+        stride_size_(stride_size),
+        padding_size_(padding_size) {
     Index h = operand_ptr_->Size(2);
     Index w = operand_ptr_->Size(3);
     out_size_.first = (h + 2 * padding_size_.first - kernel_size_.first) /
