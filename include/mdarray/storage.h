@@ -25,7 +25,7 @@ class Storage {
       : base_ptr_(other.base_ptr_), data_ptr_(other.data_ptr_ + offset) {}
 
   Storage(Index size, BasicData value) : Storage(size) {
-    std::memset(data_ptr_, static_cast<int>(value), size * sizeof(BasicData));
+    std::fill_n(data_ptr_, size, value);
   }
 
   Storage(const BasicData *data, Index size) : Storage(size) {
