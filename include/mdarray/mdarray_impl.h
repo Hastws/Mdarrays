@@ -417,8 +417,10 @@ struct AutoGradMeta {
 template <typename ImplType>
 void Assign(Storage &dist_storage, const Shape &dist_shape,
             const IndexArray &dist_stride, const ImplType &src_exp) {
-  IndexArray indexes(dist_shape.DimensionsSize());
+  omp_set_num_threads(omp_get_num_procs() * 2 / 5);
+#pragma omp parallel for schedule(static)
   for (Index i = 0; i < dist_shape.SpaceSize(); ++i) {
+    IndexArray indexes(dist_shape.DimensionsSize());
     for (Index ii = i, j = 0; j < dist_shape.DimensionsSize(); ++j) {
       if (dist_stride[j] != 0) {
         indexes[j] = ii / dist_stride[j];
@@ -434,8 +436,10 @@ void Assign(Storage &dist_storage, const Shape &dist_shape,
 template <typename ImplType>
 void InplacementAdd(Storage &dist_storage, const Shape &dist_shape,
                     const IndexArray &dist_stride, const ImplType &src_exp) {
-  IndexArray indexes(dist_shape.DimensionsSize());
+  omp_set_num_threads(omp_get_num_procs() * 2 / 5);
+#pragma omp parallel for schedule(static)
   for (Index i = 0; i < dist_shape.SpaceSize(); ++i) {
+    IndexArray indexes(dist_shape.DimensionsSize());
     for (Index ii = i, j = 0; j < dist_shape.DimensionsSize(); ++j) {
       if (dist_stride[j] != 0) {
         indexes[j] = ii / dist_stride[j];
@@ -452,31 +456,20 @@ template <typename ImplType>
 void AssignUncontiguous(Storage &dist_storage, const Shape &dist_shape,
                         const IndexArray &dist_stride,
                         const ImplType &src_exp) {
-  IndexArray indexes(dist_shape.DimensionsSize());
-  IndexArray cur(dist_shape.DimensionsSize());
-  Index idx = 0;
-  cur.Memset(0);
-
-  while (true) {
-    if (idx == dist_shape.DimensionsSize()) {
-      --idx;
-      Index offset = 0;
-      for (Index i = 0; i < indexes.ArraySize(); ++i)
-        offset += dist_stride[i] * indexes[i];
-      dist_storage[offset] = src_exp.Eval(indexes);
-    } else {
-      while (idx < dist_shape.DimensionsSize() && cur[idx] == dist_shape[idx]) {
-        cur[idx] = 0;
-        --idx;
-      }
-      if (idx > dist_shape.DimensionsSize()) {
-        break;
-      }
-
-      indexes[idx] = cur[idx];
-      ++cur[idx];
-      ++idx;
+  omp_set_num_threads(omp_get_num_procs() * 2 / 5);
+#pragma omp parallel for schedule(static)
+  for (Index i = 0; i < dist_shape.SpaceSize(); ++i) {
+    IndexArray indexes(dist_shape.DimensionsSize());
+    int index = i;
+    for (Index j = 0; j < dist_shape.DimensionsSize(); ++j) {
+      indexes[j] = index % dist_shape[j];
+      index = index / dist_shape[j];
     }
+    Index offset = 0;
+    for (Index k = 0; k < indexes.ArraySize(); ++k) {
+      offset += dist_stride[k] * indexes[k];
+    }
+    dist_storage[offset] = src_exp.Eval(indexes);
   }
 }
 
@@ -484,29 +477,20 @@ template <typename ImplType>
 void InplacementAddUncontiguous(Storage &dist_storage, const Shape &dist_shape,
                                 const IndexArray &dist_stride,
                                 const ImplType &src_exp) {
-  IndexArray indexes(dist_shape.DimensionsSize());
-  IndexArray cur(dist_shape.DimensionsSize());
-  Index idx = 0;
-  cur.Memset(0);
-
-  while (true) {
-    if (idx == dist_shape.DimensionsSize()) {
-      --idx;
-      Index offset = 0;
-      for (Index i = 0; i < indexes.ArraySize(); ++i)
-        offset += dist_stride[i] * indexes[i];
-      dist_storage[offset] += src_exp.Eval(indexes);
-    } else {
-      while (idx < dist_shape.DimensionsSize() && cur[idx] == dist_shape[idx]) {
-        cur[idx] = 0;
-        --idx;
-      }
-      if (idx > dist_shape.DimensionsSize()) break;
-
-      indexes[idx] = cur[idx];
-      ++cur[idx];
-      ++idx;
+  omp_set_num_threads(omp_get_num_procs() * 2 / 5);
+#pragma omp parallel for schedule(static)
+  for (Index i = 0; i < dist_shape.SpaceSize(); ++i) {
+    IndexArray indexes(dist_shape.DimensionsSize());
+    int index = i;
+    for (Index j = 0; j < dist_shape.DimensionsSize(); ++j) {
+      indexes[j] = index % dist_shape[j];
+      index = index / dist_shape[j];
     }
+    Index offset = 0;
+    for (Index k = 0; k < indexes.ArraySize(); ++k) {
+      offset += dist_stride[k] * indexes[k];
+    }
+    dist_storage[offset] += src_exp.Eval(indexes);
   }
 }
 

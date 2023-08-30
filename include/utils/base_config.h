@@ -2,6 +2,7 @@
 #define MULTIDIMENSIONAL_ARRAYS_INCLUDE_UTILS_BASE_CONFIG_H
 
 #include <limits>
+#include <omp.h>
 
 namespace KD {
 
