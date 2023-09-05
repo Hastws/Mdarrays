@@ -11,7 +11,7 @@ include_directories(third_party)
 FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 message(${PROJECT_SOURCE_DIR})
-
+add_definitions(-DOPEN_MULTI_PROCESS=true)
 add_library(multidimensional_arrays_lib STATIC ${SRC_FILES})
 add_library(memory_pool_lib STATIC ${PROJECT_SOURCE_DIR}/third_party/memory_pool/allocator.h
         ${PROJECT_SOURCE_DIR}/third_party/memory_pool/allocator.cpp)
@@ -49,7 +49,7 @@ target_compile_definitions(cnn_mnist PRIVATE
 )
 
 target_compile_definitions(cnn_cifar_10 PRIVATE
-PRIVATE CIFAR_10_DATA_FOLDER="${PROJECT_SOURCE_DIR}/data/cifar_10"
+        PRIVATE CIFAR_10_DATA_FOLDER= "${PROJECT_SOURCE_DIR}/data/cifar_10"
 )
 
 target_compile_definitions(cnn_cifar_10 PRIVATE PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
