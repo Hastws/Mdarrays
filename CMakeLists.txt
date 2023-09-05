@@ -12,45 +12,20 @@ FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 message(${PROJECT_SOURCE_DIR})
 add_definitions(-DOPEN_MULTI_PROCESS=true)
+add_definitions(-DMLP_MNIST_TRAIN_IMAGES="${PROJECT_SOURCE_DIR}/data/mnist/train-images.idx3-ubyte")
+add_definitions(-DMLP_MNIST_TRAIN_LABELS="${PROJECT_SOURCE_DIR}/data/mnist/train-labels.idx1-ubyte")
+add_definitions(-DMLP_MNIST_TEST_IMAGES="${PROJECT_SOURCE_DIR}/data/mnist/t10k-images.idx3-ubyte")
+add_definitions(-DMLP_MNIST_TEST_LABELS="${PROJECT_SOURCE_DIR}/data/mnist/t10k-labels.idx1-ubyte")
+add_definitions(-DCIFAR_10_DATA_FOLDER="${PROJECT_SOURCE_DIR}/data/cifar_10")
+
 add_library(multidimensional_arrays_lib STATIC ${SRC_FILES})
 add_library(memory_pool_lib STATIC ${PROJECT_SOURCE_DIR}/third_party/memory_pool/allocator.h
         ${PROJECT_SOURCE_DIR}/third_party/memory_pool/allocator.cpp)
-if (WIN32)
-    message("Current platform windows.")
-    add_executable(mdarray test/test_base.cpp ${SRC_FILES})
-    add_executable(mlp_mnist test/mlp_mnist.cpp ${SRC_FILES})
-    add_executable(cnn_mnist test/cnn_mnist.cpp ${SRC_FILES})
-    add_executable(cnn_cifar_10 test/cnn_cifar_10.cpp ${SRC_FILES})
-elseif (UNIX)
-    message("Current platform unix.")
-    add_subdirectory(./third_party/backward_cpp)
-    add_executable(mdarray test/test_base.cpp ${SRC_FILES} ${BACKWARD_ENABLE})
-    add_executable(mlp_mnist test/mlp_mnist.cpp ${SRC_FILES} ${BACKWARD_ENABLE})
-    add_executable(cnn_mnist test/cnn_mnist.cpp ${SRC_FILES} ${BACKWARD_ENABLE})
-    add_executable(cnn_cifar_10 test/cnn_cifar_10.cpp ${SRC_FILES} ${BACKWARD_ENABLE})
-    add_backward(mdarray)
-    add_backward(mlp_mnist)
-    add_backward(cnn_mnist)
-    add_backward(cnn_cifar_10)
-endif ()
 
-target_compile_definitions(mlp_mnist
-        PRIVATE MLP_MNIST_TRAIN_IMAGES="${PROJECT_SOURCE_DIR}/data/mnist/train-images.idx3-ubyte"
-        PRIVATE MLP_MNIST_TRAIN_LABELS="${PROJECT_SOURCE_DIR}/data/mnist/train-labels.idx1-ubyte"
-        PRIVATE MLP_MNIST_TEST_IMAGES="${PROJECT_SOURCE_DIR}/data/mnist/t10k-images.idx3-ubyte"
-        PRIVATE MLP_MNIST_TEST_LABELS="${PROJECT_SOURCE_DIR}/data/mnist/t10k-labels.idx1-ubyte"
-)
-
-target_compile_definitions(cnn_mnist PRIVATE
-        PRIVATE MLP_MNIST_TRAIN_IMAGES="${PROJECT_SOURCE_DIR}/data/mnist/train-images.idx3-ubyte"
-        PRIVATE MLP_MNIST_TRAIN_LABELS="${PROJECT_SOURCE_DIR}/data/mnist/train-labels.idx1-ubyte"
-        PRIVATE MLP_MNIST_TEST_IMAGES="${PROJECT_SOURCE_DIR}/data/mnist/t10k-images.idx3-ubyte"
-        PRIVATE MLP_MNIST_TEST_LABELS="${PROJECT_SOURCE_DIR}/data/mnist/t10k-labels.idx1-ubyte"
-)
-
-target_compile_definitions(cnn_cifar_10 PRIVATE
-        PRIVATE CIFAR_10_DATA_FOLDER= "${PROJECT_SOURCE_DIR}/data/cifar_10"
-)
+add_executable(mdarray test/test_base.cpp ${SRC_FILES})
+add_executable(mlp_mnist test/mlp_mnist.cpp ${SRC_FILES})
+add_executable(cnn_mnist test/cnn_mnist.cpp ${SRC_FILES})
+add_executable(cnn_cifar_10 test/cnn_cifar_10.cpp ${SRC_FILES})
 
 target_compile_definitions(cnn_cifar_10 PRIVATE PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
