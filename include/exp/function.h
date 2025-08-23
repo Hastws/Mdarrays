@@ -10,6 +10,7 @@
 #include "exp/operator/basic_op.h"
 #include "exp/operator/conv.h"
 #include "exp/operator/log_softmax.h"
+#include "exp/operator/softmax.h"
 #include "exp/operator/matrix_op.h"
 #include "exp/operator/nll_loss.h"
 #include "exp/operator/reduce_op.h"
@@ -365,6 +366,16 @@ Exp<UnaryExpImpl<LogSoftmax, OIType>> CreateOperationLogSoftmax(
               "Mdarray, but got a "
                   << operand.Impl().DimensionsSize() << " one");
   return CreateUnaryOperationFunction<LogSoftmax, OIType>(operand);
+}
+// function for CreateOperationSoftMax
+template <typename OIType>
+Exp<UnaryExpImpl<Softmax, OIType>> CreateOperationSoftmax(
+    const Exp<OIType> &operand) {
+  CHECK_EQUAL(operand.Impl().DimensionsSize(), 2,
+              "CreateOperationLogSoftmax Only supported for 2D "
+              "Mdarray, but got a "
+                  << operand.Impl().DimensionsSize() << " one");
+  return CreateUnaryOperationFunction<Softmax, OIType>(operand);
 }
 
 // function for reduce operator

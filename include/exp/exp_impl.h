@@ -11,6 +11,7 @@
 #include "exp/operator/log_softmax.h"
 #include "exp/operator/nll_loss.h"
 #include "exp/operator/reduce_op.h"
+#include "exp/operator/softmax.h"
 #include "memory_pool/allocator.h"
 #include "utils/base_config.h"
 #include "utils/fixed_array.h"
@@ -211,6 +212,60 @@ class BinaryExpImpl
 }  // namespace KD
 
 namespace KD {
+
+template <typename OIType>
+class UnaryExpImpl<Operator::Softmax, OIType>
+    : public ExpImpl<UnaryExpImpl<Operator::Softmax, OIType>> {
+ public:
+  using operand_type = OIType;
+
+  explicit UnaryExpImpl(const ExpImplPtr<OIType> &ptr)
+      : operand_ptr_(ptr, true),
+        n_batch_(operand_ptr_->Size(0)),
+        batch_sum_exp_(
+            Allocator::UniqueAllocate<BasicData>(sizeof(BasicData) * n_batch_)),
+        batch_max_cls_(Allocator::UniqueAllocate<BasicData>(sizeof(BasicData) *
+                                                            n_batch_)) {
+    Operator::Softmax::Precompute(*operand_ptr_, batch_sum_exp_.get(),
+                                  batch_max_cls_.get());
+  }
+
+  Index DimensionsSize() const {
+    return Operator::Softmax::DimensionsSize(*operand_ptr_);
+  }
+
+  Index Size(Index idx) const {
+    return Operator::Softmax::Size(idx, *operand_ptr_);
+  }
+
+  IndexArray Size() const {
+    IndexArray shape(DimensionsSize());
+    for (Index i = 0; i < shape.ArraySize(); ++i) shape[i] = Size(i);
+    return shape;
+  }
+
+  BasicData Eval(IndexArray &indexes) const {
+    return Operator::Softmax::Map(indexes, *operand_ptr_, batch_sum_exp_.get(),
+                                  batch_max_cls_.get());
+  }
+
+  bool RequiresGrad() const { return operand_ptr_->RequiresGrad(); }
+
+  template <typename GIType>
+  void Backward(const GIType &grad) {
+    CHECK_EQUAL(this->GradCount(), 0, "Reused ExpImpl can't be Backward.");
+    UnaryGradImpl<typename KD::Operator::Softmax::Grad, GIType, OIType>
+        out_grad(grad, *operand_ptr_, batch_sum_exp_.get(),
+                 batch_max_cls_.get());
+    operand_ptr_.InvokeBackward(out_grad);
+  }
+
+ private:
+  ExpImplPtr<OIType> operand_ptr_;
+  Index n_batch_;
+  Allocator::UniquePtr<BasicData> batch_sum_exp_;
+  Allocator::UniquePtr<BasicData> batch_max_cls_;
+};
 
 template <typename OIType>
 class UnaryExpImpl<Operator::LogSoftmax, OIType>

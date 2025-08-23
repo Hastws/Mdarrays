@@ -9,9 +9,10 @@
 #include "exp/operator/log_softmax.h"
 #include "exp/operator/nll_loss.h"
 #include "exp/operator/reduce_op.h"
-#include "utils/fixed_array.h"
+#include "exp/operator/softmax.h"
 #include "utils/base_config.h"
 #include "utils/exception.h"
+#include "utils/fixed_array.h"
 
 namespace KD {
 template <typename ImplType>
@@ -105,6 +106,35 @@ class BinaryGradImpl
   const GIType &grad_;
   const LhsImplType &lhs_;
   const RhsImplType &rhs_;
+};
+
+template <typename GIType, typename OIType>
+class UnaryGradImpl<typename Operator::Softmax::Grad, GIType, OIType>
+    : public GradImpl<
+          UnaryGradImpl<typename Operator::Softmax::Grad, GIType, OIType>> {
+ public:
+  UnaryGradImpl(const GIType &grad, const OIType &operand,
+                BasicData *batch_sum_exp, BasicData *batch_max_cls)
+      : grad_(grad),
+        operand_(operand),
+        batch_sum_exp_(batch_sum_exp),
+        batch_max_cls_(batch_max_cls) {}
+
+  IndexArray GradSize() const {
+    return GradResultSize<typename Operator::Softmax::Grad, GIType, OIType>(
+        grad_, operand_);
+  }
+
+  BasicData Eval(IndexArray &indexes) const {
+    return Operator::Softmax::Grad::Map(indexes, grad_, operand_,
+                                        batch_sum_exp_, batch_max_cls_);
+  }
+
+ private:
+  const GIType &grad_;
+  const OIType &operand_;
+  BasicData *batch_sum_exp_;
+  BasicData *batch_max_cls_;
 };
 
 template <typename GIType, typename OIType>
