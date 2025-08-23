@@ -417,11 +417,6 @@ struct AutoGradMeta {
 template <typename ImplType>
 void Assign(Storage &dist_storage, const Shape &dist_shape,
             const IndexArray &dist_stride, const ImplType &src_exp) {
-#if OPEN_MULTI_PROCESS
-  omp_set_num_threads(omp_get_num_procs() * 2 / 5);
-#pragma omp parallel for default(none) \
-    shared(dist_stride, dist_storage, dist_shape, src_exp) schedule(static)
-#endif
   for (Index i = 0; i < dist_shape.SpaceSize(); ++i) {
     IndexArray indexes(dist_shape.DimensionsSize());
     for (Index ii = i, j = 0; j < dist_shape.DimensionsSize(); ++j) {
@@ -439,11 +434,6 @@ void Assign(Storage &dist_storage, const Shape &dist_shape,
 template <typename ImplType>
 void InplacementAdd(Storage &dist_storage, const Shape &dist_shape,
                     const IndexArray &dist_stride, const ImplType &src_exp) {
-#if OPEN_MULTI_PROCESS
-  omp_set_num_threads(omp_get_num_procs() * 2 / 5);
-#pragma omp parallel for default(none) \
-    shared(dist_stride, dist_storage, dist_shape, src_exp) schedule(static)
-#endif
   for (Index i = 0; i < dist_shape.SpaceSize(); ++i) {
     IndexArray indexes(dist_shape.DimensionsSize());
     for (Index ii = i, j = 0; j < dist_shape.DimensionsSize(); ++j) {
@@ -463,12 +453,6 @@ void AssignUncontiguous(Storage &dist_storage, const Shape &dist_shape,
                         const IndexArray &dist_stride,
                         const ImplType &src_exp) {
   Index space_size = dist_shape.SpaceSize();
-#if OPEN_MULTI_PROCESS
-  omp_set_num_threads(omp_get_num_procs() * 2 / 5);
-#pragma omp parallel for default(none)                                 \
-    shared(space_size, dist_stride, dist_storage, dist_shape, src_exp) \
-    schedule(static)
-#endif
   for (Index i = 0; i < space_size; i++) {
     IndexArray indexes(dist_shape.DimensionsSize());
     Index index = i;
