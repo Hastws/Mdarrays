@@ -8,6 +8,7 @@
 
 #include "memory_pool/allocator.h"
 #include "utils/base_config.h"
+#include "dynamic_array.h"
 
 namespace KD {
 

@@ -19,5 +19,7 @@ constexpr Index INDEX_MIN = 0;
 constexpr BasicData DATA_MAX = std::numeric_limits<BasicData>::max();
 constexpr BasicData DATA_MIN = std::numeric_limits<BasicData>::lowest();
 
+constexpr BasicData EPS = 1e-12;
+
 }  // namespace KD
 #endif

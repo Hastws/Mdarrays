@@ -186,6 +186,112 @@ Exp<UnaryExpImpl<Sigmoid, OIType>> CreateOperationSigmoid(
   return CreateUnaryOperationFunction<Sigmoid, OIType>(operand);
 }
 
+template <typename OIType>
+Exp<UnaryExpImpl<Tanh, OIType>> CreateOperationTanh(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Tanh, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<ExpFunction, OIType>> CreateOperationExp(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<ExpFunction, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Log, OIType>> CreateOperationLog(const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Log, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Sqrt, OIType>> CreateOperationSqrt(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Sqrt, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Rsqrt, OIType>> CreateOperationRsqrt(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Rsqrt, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Reciprocal, OIType>> CreateOperationReciprocal(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Reciprocal, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Softplus, OIType>> CreateOperationSoftplus(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Softplus, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Swish, OIType>> CreateOperationSwish(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Swish, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Mish, OIType>> CreateOperationMish(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Mish, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<GELU, OIType>> CreateOperationGelu(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<GELU, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<HardSigmoid, OIType>> CreateOperationHardSigmoid(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<HardSigmoid, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<HardSwish, OIType>> CreateOperationHardSwish(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<HardSwish, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Abs, OIType>> CreateOperationAbs(const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Abs, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<LeakyReLU, OIType>> CreateOperationLeakReLU(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<LeakyReLU, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<ELU, OIType>> CreateOperationLeakELU(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<ELU, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<ReLU6, OIType>> CreateOperationLeakReLU6(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<ReLU6, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Log1p, OIType>> CreateOperationLeakLog1p(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Log1p, OIType>(operand);
+}
+
+template <typename OIType>
+Exp<UnaryExpImpl<Expm1, OIType>> CreateOperationExpm1(
+    const Exp<OIType> &operand) {
+  return CreateUnaryOperationFunction<Expm1, OIType>(operand);
+}
+
 // function for matrix operation
 template <typename OIType>
 Exp<UnaryExpImpl<MatrixTranspose, OIType>> CreateOperationMatrixTranspose(
