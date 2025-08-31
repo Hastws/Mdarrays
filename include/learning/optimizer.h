@@ -6,7 +6,7 @@
 
 #include "learning/module.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 class OptimizerBase {
  public:
@@ -59,5 +59,5 @@ class StochasticGradientDescentWithMomentum : public OptimizerBase {
   std::vector<Allocator::UniquePtr<BasicData>> running_means_;
 };
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg
 #endif

@@ -8,7 +8,7 @@
 #include "utils/base_config.h"
 #include "utils/utils.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Operator {
 
 struct UnaryBasicOperator {
@@ -622,5 +622,5 @@ struct Identity : public UnaryBasicOperator {
   };
 };
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 #endif

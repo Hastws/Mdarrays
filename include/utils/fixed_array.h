@@ -10,7 +10,7 @@
 #include "utils/base_config.h"
 #include "dynamic_array.h"
 
-namespace KD {
+namespace Autoalg {
 
 template <typename DataType>
 class FixedArray {
@@ -62,6 +62,6 @@ class FixedArray {
   DataType array_[FixedArraySize];
 };
 
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

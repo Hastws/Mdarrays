@@ -73,7 +73,7 @@
     }                                                                   \
   } while (0)
 
-namespace KD {
+namespace Autoalg {
 namespace Allocator {
 
 using ChunkId = unsigned long;
@@ -432,7 +432,7 @@ static bool is_memory_pool_inited = false;
 void *AllocatorInterface::Allocate(MemorySize n_bytes) {
   if (!is_memory_pool_inited) {
     LOG_MP_INFO("Process Init memory pool");
-    memory_pool = FirstFitAllocator::MemoryPoolInit(2048 * MB, 1024 * MB, 0);
+    memory_pool = FirstFitAllocator::MemoryPoolInit(2048 * MB * 4, 1024 * MB, 0);
     is_memory_pool_inited = true;
   }
   void *p = FirstFitAllocator::MemoryPoolAlloc(memory_pool, n_bytes);
@@ -447,4 +447,4 @@ void AllocatorInterface::Deallocate(void *ptr) {
 }
 
 }  // namespace Allocator
-}  // namespace KD
+}  // namespace Autoalg

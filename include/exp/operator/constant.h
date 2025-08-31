@@ -6,7 +6,7 @@
 #include "utils/base_config.h"
 #include "utils/exception.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Operator {
 // A paradigm
 struct Constant {
@@ -27,5 +27,5 @@ struct Constant {
   };
 };
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 #endif

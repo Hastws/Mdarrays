@@ -8,7 +8,7 @@
 
 #include "utils/fixed_array.h"
 #include "utils/base_config.h"
-namespace KD {
+namespace Autoalg {
 namespace Operator {
 // Acceleration of convolution operation
 struct Img2col {
@@ -186,6 +186,6 @@ struct MaxPool2d {
 };
 
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

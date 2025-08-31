@@ -6,7 +6,7 @@
 #include "utils/base_config.h"
 #include "utils/exception.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Operator {
 struct ReduceOperator {
   template <typename OperandType>
@@ -173,6 +173,6 @@ struct Max : public ReduceOperator {
   };
 };
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

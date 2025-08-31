@@ -5,7 +5,7 @@
 #include "memory_pool/allocator.h"
 #include "utils/exception.h"
 
-namespace KD {
+namespace Autoalg {
 
 Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Slice(Index dim,
                                                      Index idx) const {
@@ -24,7 +24,7 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Slice(Index dim,
   Shape shape(shape_, dim);
   IndexArray stride(shape_.DimensionsSize() - 1);
 
-  KD::Index i = 0;
+  Autoalg::Index i = 0;
   for (; i < dim; i++) {
     stride[i] = stride_[i];
   }
@@ -134,6 +134,23 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Permute(
   return ret_ptr;
 }
 
+Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Contiguous() const {
+  if (IsContiguous()) {
+    // 仍返回一个视图（共享存储，offset 不变），以保持语义一致
+    return Allocator::UniqueConstruct<MdarrayImpl>(
+        this->GetStorage(), this->Size(), this->GetStride(),
+        this->RequiresGrad());
+  }
+  // 分配一块连续内存，然后用现有 Assign 规则拷贝数据，
+  // 同时通过 operator= 建图，保证梯度回传到原张量（含多层 view）
+  auto out = Allocator::UniqueConstruct<MdarrayImpl>(this->Size(),
+                                                     this->RequiresGrad());
+  *out = *this;  // 这里会设置 out->grad_meta_ptr_->grad_fn_ptr_
+                 // 指向“当前表达式/视图”
+  return out;
+}
+
+
 Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::View(const Shape &shape) const {
   CHECK_TRUE(IsContiguous(),
              "View() is only supported to contiguous multidimensional_arrays");
@@ -195,4 +212,4 @@ Allocator::UniquePtr<MdarrayImpl> MdarrayImpl::Grad() const {
                                                  stride_, false);
 }
 
-}  // namespace KD
+}  // namespace Autoalg

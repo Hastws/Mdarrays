@@ -7,7 +7,7 @@
 
 #include "utils/base_config.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Operator {
 // 1. It is easier to obtain derivatives during logarithmic operations, which
 // speeds up the speed of backpropagation.
@@ -55,7 +55,7 @@ struct LogSoftmax {
       }
 
       BasicData sum_exp = 0;
-      for (KD::Index j = 0; j < n_class; ++j) {
+      for (Autoalg::Index j = 0; j < n_class; ++j) {
         sum_exp += std::exp(batch[j] - max_cls);
       }
 
@@ -100,5 +100,5 @@ struct LogSoftmax {
   };
 };
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 #endif

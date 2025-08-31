@@ -6,77 +6,77 @@
 #include "learning/optimizer.h"
 #include "mdarray/mdarray.h"
 
-class MLP : public KD::Learning::Module {
+class MLP : public Autoalg::Learning::Module {
  public:
-  MLP(KD::Index in, KD::Index hidden_1, KD::Index out)
+  MLP(Autoalg::Index in, Autoalg::Index hidden_1, Autoalg::Index out)
       : linear_1_(in, hidden_1), linear_2_(hidden_1, out) {}
 
-  KD::Mdarray Forward(const KD::Mdarray &input) override {
-    KD::Mdarray x1 = linear_1_.Forward(input);
-    KD::Mdarray y = linear_2_.Forward(x1);
+  Autoalg::Mdarray Forward(const Autoalg::Mdarray &input) override {
+    Autoalg::Mdarray x1 = linear_1_.Forward(input);
+    Autoalg::Mdarray y = linear_2_.Forward(x1);
     return y;
   }
 
-  KD::Learning::ParamsDict Parameters() override {
+  Autoalg::Learning::ParamsDict Parameters() override {
     return {{"linear_1", linear_1_.Parameters()},
             {"linear_2", linear_2_.Parameters()}};
   }
 
  private:
-  KD::Learning::LinearWithReLU linear_1_;
-  KD::Learning::Linear linear_2_;
+  Autoalg::Learning::LinearWithReLU linear_1_;
+  Autoalg::Learning::Linear linear_2_;
 };
 
 int main() {
-  constexpr KD::Index epoch = 3;
-  constexpr KD::Index batch_size = 64;
-  constexpr KD::BasicData lr = 0.05;
-  constexpr KD::BasicData momentum = 0.90;
-  constexpr KD::BasicData lr_decay_factor = 0.1;
-  constexpr KD::Index lr_decay_epoch = 2;
-  constexpr KD::Index print_iterators = 10;
+  constexpr Autoalg::Index epoch = 3;
+  constexpr Autoalg::Index batch_size = 64;
+  constexpr Autoalg::BasicData lr = 0.05;
+  constexpr Autoalg::BasicData momentum = 0.90;
+  constexpr Autoalg::BasicData lr_decay_factor = 0.1;
+  constexpr Autoalg::Index lr_decay_epoch = 2;
+  constexpr Autoalg::Index print_iterators = 10;
 
   using namespace std::chrono;
   steady_clock::time_point start_tp = steady_clock::now();
 
   // dataset
-  KD::SourceData::MNIST train_dataset(std::string(MLP_MNIST_TRAIN_IMAGES),
+  Autoalg::SourceData::MNIST train_dataset(std::string(MLP_MNIST_TRAIN_IMAGES),
                                       std::string(MLP_MNIST_TRAIN_LABELS),
                                       batch_size);
-  KD::SourceData::MNIST val_dataset(std::string(MLP_MNIST_TEST_IMAGES),
+  Autoalg::SourceData::MNIST val_dataset(std::string(MLP_MNIST_TEST_IMAGES),
                                     std::string(MLP_MNIST_TEST_LABELS),
                                     batch_size);
 
   // model and criterion
-  MLP mlp(KD::SourceData::MNIST::Img::pixels_size_, 64, 10);
-  KD::Learning::CrossEntropy criterion;
+  MLP mlp(Autoalg::SourceData::MNIST::Img::pixels_size_, 64, 10);
+  Autoalg::Learning::CrossEntropy criterion;
 
   // optimizer
-  KD::Learning::StochasticGradientDescentWithMomentum optimizer(
+  Autoalg::Learning::StochasticGradientDescentWithMomentum optimizer(
       mlp.Parameters(), lr, momentum);
 
-  KD::Index n_samples;
-  const KD::BasicData *batch_samples;
-  const KD::Index *batch_labels;
-  for (KD::Index i = 0; i < epoch; ++i) {
+  Autoalg::Index n_samples;
+  const Autoalg::BasicData *batch_samples;
+  const Autoalg::Index *batch_labels;
+  for (Autoalg::Index i = 0; i < epoch; ++i) {
     LOG_MDA_INFO("Epoch " << i << " training...")
     LOG_MDA_INFO("total iterations: " << train_dataset.BatchesSize())
     train_dataset.Shuffle();
 
     if (i == lr_decay_epoch) {
-      KD::BasicData optimizer_lr = optimizer.Lr();
+      Autoalg::BasicData optimizer_lr = optimizer.Lr();
       optimizer.SetLr(optimizer_lr * lr_decay_factor);
       LOG_MDA_INFO("Lr decay to " << optimizer.Lr())
     }
 
-    for (KD::Index j = 0; j < train_dataset.BatchesSize(); ++j) {
+    for (Autoalg::Index j = 0; j < train_dataset.BatchesSize(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
           train_dataset.GetBatch(j);
-      KD::Mdarray input(batch_samples,
-                        {n_samples, KD::SourceData::MNIST::Img::pixels_size_});
+      Autoalg::Mdarray input(batch_samples,
+                        {n_samples, Autoalg::SourceData::MNIST::Img::pixels_size_});
 
-      KD::Mdarray output = mlp.Forward(input);
-      KD::Mdarray loss = criterion.Forward(output, batch_labels);
+      Autoalg::Mdarray output = mlp.Forward(input);
+      Autoalg::Mdarray loss = criterion.Forward(output, batch_labels);
       loss.Backward();
 
       optimizer.Step();
@@ -88,18 +88,18 @@ int main() {
     }
 
     LOG_MDA_INFO("Epoch " << i << " Evaluating...")
-    KD::Index total_samples = 0, correct_samples = 0;
-    for (KD::Index j = 0; j < val_dataset.BatchesSize(); ++j) {
+    Autoalg::Index total_samples = 0, correct_samples = 0;
+    for (Autoalg::Index j = 0; j < val_dataset.BatchesSize(); ++j) {
       std::tie(n_samples, batch_samples, batch_labels) =
           val_dataset.GetBatch(j);
-      KD::Mdarray input(batch_samples,
-                        {n_samples, KD::SourceData::MNIST::Img::pixels_size_});
-      KD::Mdarray output = mlp.Forward(input);
-      KD::Mdarray predict = KD::Operator::CreateOperationArgmax(output, 1);
+      Autoalg::Mdarray input(batch_samples,
+                        {n_samples, Autoalg::SourceData::MNIST::Img::pixels_size_});
+      Autoalg::Mdarray output = mlp.Forward(input);
+      Autoalg::Mdarray predict = Autoalg::Operator::CreateOperationArgmax(output, 1);
 
-      for (KD::Index k = 0; k < n_samples; ++k) {
+      for (Autoalg::Index k = 0; k < n_samples; ++k) {
         ++total_samples;
-        KD::Index pd_label = static_cast<KD::Index>(predict[{k}]);
+        Autoalg::Index pd_label = static_cast<Autoalg::Index>(predict[{k}]);
         if (pd_label == batch_labels[k]) {
           ++correct_samples;
         }
@@ -107,7 +107,7 @@ int main() {
     }
     LOG_MDA_INFO("total samples: " << total_samples << " | correct samples: "
                                    << correct_samples << " | acc: ")
-    LOG_MDA_INFO(static_cast<KD::BasicData>(correct_samples) / total_samples)
+    LOG_MDA_INFO(static_cast<Autoalg::BasicData>(correct_samples) / total_samples)
   }
 
   steady_clock::time_point end_tp = steady_clock::now();

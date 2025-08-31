@@ -3,7 +3,7 @@
 #include <chrono>
 #include <cmath>
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 std::default_random_engine InitializerBase::engine_(
     std::chrono::system_clock::now().time_since_epoch().count());
@@ -48,4 +48,4 @@ void UniformInitializer::Init() const {
 }
 
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg

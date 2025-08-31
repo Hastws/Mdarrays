@@ -16,7 +16,7 @@
 #include "utils/base_config.h"
 #include "utils/fixed_array.h"
 
-namespace KD {
+namespace Autoalg {
 
 // Forward declaration
 template <typename T>
@@ -110,9 +110,9 @@ class ExpImplPtr {
   bool with_grad_;
   Allocator::DeleteHandler<ImplType> delete_handler;
 };
-}  // namespace KD
+}  // namespace Autoalg
 
-namespace KD {
+namespace Autoalg {
 template <typename OperatorType, typename OIType>  // OIType = OperandImplType
 class UnaryExpImpl : public ExpImpl<UnaryExpImpl<OperatorType, OIType>> {
  public:
@@ -209,9 +209,9 @@ class BinaryExpImpl
   ExpImplPtr<LhsImplType> lhs_ptr_;
   ExpImplPtr<RhsImplType> rhs_ptr_;
 };
-}  // namespace KD
+}  // namespace Autoalg
 
-namespace KD {
+namespace Autoalg {
 
 template <typename OIType>
 class UnaryExpImpl<Operator::Softmax, OIType>
@@ -254,7 +254,7 @@ class UnaryExpImpl<Operator::Softmax, OIType>
   template <typename GIType>
   void Backward(const GIType &grad) {
     CHECK_EQUAL(this->GradCount(), 0, "Reused ExpImpl can't be Backward.");
-    UnaryGradImpl<typename KD::Operator::Softmax::Grad, GIType, OIType>
+    UnaryGradImpl<typename Autoalg::Operator::Softmax::Grad, GIType, OIType>
         out_grad(grad, *operand_ptr_, batch_sum_exp_.get(),
                  batch_max_cls_.get());
     operand_ptr_.InvokeBackward(out_grad);
@@ -679,5 +679,5 @@ class UnaryExpImpl<Operator::Constant, BasicData>
   IndexArray shape_;
 };
 
-}  // namespace KD
+}  // namespace Autoalg
 #endif

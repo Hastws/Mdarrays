@@ -5,7 +5,7 @@
 #include "exp/function.h"
 #include "learning/init.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 Linear::Linear(Index in_features, Index out_features)
     : weight_(Shape{out_features, in_features}, true),
@@ -37,9 +37,9 @@ Mdarray LinearWithReLU::Forward(const Mdarray &x) {
   return y2;
 }
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 Conv2d::Conv2d(Index in_channels, Index out_channels, MatrixSize kernel_size,
                MatrixSize stride, MatrixSize padding)
@@ -91,9 +91,9 @@ Mdarray Conv2dWithReLU::Forward(const Mdarray &x) {
   return y3;
 }
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 
 MaxPool2d::MaxPool2d(MatrixSize kernel_size, MatrixSize stride,
@@ -124,4 +124,4 @@ Mdarray CrossEntropy::Forward(const Mdarray &input, const Index *labels) {
   return loss;
 }
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg

@@ -14,7 +14,7 @@
 #include "utils/exception.h"
 #include "utils/fixed_array.h"
 
-namespace KD {
+namespace Autoalg {
 template <typename ImplType>
 class GradImpl {
  public:
@@ -294,5 +294,5 @@ class UnaryGradImpl<Operator::Constant, void, BasicData>
   BasicData value_;
   IndexArray shape_;
 };
-}  // namespace KD
+}  // namespace Autoalg
 #endif

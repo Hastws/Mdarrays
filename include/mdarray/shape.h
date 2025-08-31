@@ -8,7 +8,7 @@
 #include "utils/base_config.h"
 #include "utils/fixed_array.h"
 
-namespace KD {
+namespace Autoalg {
 
 class Shape {
  public:
@@ -72,13 +72,13 @@ class Shape {
 template <typename Stream>
 Stream &operator<<(Stream &stream, const Shape &s) {
   stream << '(' << s[0];
-  for (KD::Index i = 1; i < s.DimensionsSize(); ++i) {
+  for (Autoalg::Index i = 1; i < s.DimensionsSize(); ++i) {
     stream << ", " << s[i];
   }
   stream << ")";
   return stream;
 }
 
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

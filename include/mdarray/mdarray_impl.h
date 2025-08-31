@@ -11,7 +11,7 @@
 #include "mdarray/storage.h"
 #include "utils/exception.h"
 
-namespace KD {
+namespace Autoalg {
 
 struct AutoGradMeta;
 
@@ -44,7 +44,7 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
         requires_grad_(requires_grad),
         grad_meta_ptr_(nullptr) {
     // if shape_[i] == 1, set stride_[i] = 0. For broadcasting operation.
-    for (KD::Index i = 0; i < stride_.ArraySize(); ++i) {
+    for (Autoalg::Index i = 0; i < stride_.ArraySize(); ++i) {
       stride_[i] = shape_[i] == 1 ? 0 : shape_.SubSpaceSize(i + 1);
     }
     if (requires_grad_) {
@@ -165,10 +165,12 @@ class MdarrayImpl : public ExpImpl<MdarrayImpl> {
   Allocator::UniquePtr<MdarrayImpl> Permute(
       std::initializer_list<Index> dims) const;
 
+  Allocator::UniquePtr<MdarrayImpl> Contiguous() const;
+
   // member function for expression template
   BasicData Eval(IndexArray &indexes) const {
     Index offset = 0;
-    for (KD::Index i = 0; i < DimensionsSize(); ++i) {
+    for (Autoalg::Index i = 0; i < DimensionsSize(); ++i) {
       offset += indexes[i] * stride_[i];
     }
     return storage_[offset];
@@ -320,9 +322,9 @@ class ExpImplPtr<MdarrayImpl> {
   Index version_;
   Allocator::DeleteHandler<MdarrayImpl> delete_handler_;
 };
-}  // namespace KD
+}  // namespace Autoalg
 
-namespace KD {
+namespace Autoalg {
 struct GradFn {
   virtual void operator()() = 0;
 
@@ -342,7 +344,7 @@ struct GradFn {
 
     BasicData Eval(IndexArray &indexes) const {
       Index offset = 0;
-      for (KD::Index i = 0; i < shape_.DimensionsSize(); ++i) {
+      for (Autoalg::Index i = 0; i < shape_.DimensionsSize(); ++i) {
         offset += indexes[i] * stride_[i];
       }
       return storage_[offset];
@@ -562,5 +564,5 @@ inline void MdarrayImpl::Backward() {
     }
   }
 }
-}  // namespace KD
+}  // namespace Autoalg
 #endif

@@ -5,10 +5,10 @@
 
 #include "utils/base_config.h"
 
-namespace KD {
+namespace Autoalg {
 inline BasicData Clamp(const BasicData v, const BasicData lo,
                        const BasicData hi) {
   return std::max(lo, std::min(v, hi));
 }
-}  // namespace KD
+}  // namespace Autoalg
 #endif  // MULTIDIMENSIONAL_ARRAYS_INCLUDE_UTILS_UTILS_H

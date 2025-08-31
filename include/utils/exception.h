@@ -7,7 +7,7 @@
 
 #include "log.h"
 
-namespace KD {
+namespace Autoalg {
 struct Error : public std::exception {
   Error(const char *file, const char *func, unsigned int line);
 
@@ -23,7 +23,7 @@ struct Error : public std::exception {
 #define THROW_ERROR(msg)               \
   do {                                 \
     LOG_MDA_ERROR(msg)                 \
-    throw ::KD::Error(ERROR_LOCATION); \
+    throw ::Autoalg::Error(ERROR_LOCATION); \
   } while (0);
 
 #ifndef NDEBUG
@@ -95,5 +95,5 @@ struct Error : public std::exception {
 
 #endif
 
-}  // namespace KD
+}  // namespace Autoalg
 #endif

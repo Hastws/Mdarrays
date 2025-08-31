@@ -9,7 +9,7 @@
 #include "memory_pool/allocator.h"
 #include "utils/base_config.h"
 
-namespace KD {
+namespace Autoalg {
 
 template <typename DataType>
 class DynamicArray {
@@ -57,6 +57,6 @@ class DynamicArray {
   Allocator::UniquePtr<DataType> data_ptr_;
 };
 
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

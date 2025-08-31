@@ -7,7 +7,7 @@
 
 #include "utils/base_config.h"
 
-namespace KD {
+namespace Autoalg {
 namespace SourceData {
 class DatasetBase {
  public:
@@ -85,5 +85,5 @@ class Cifar10 : public DatasetBase {
 };
 
 }  // namespace SourceData
-}  // namespace KD
+}  // namespace Autoalg
 #endif

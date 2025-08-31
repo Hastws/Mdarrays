@@ -8,7 +8,7 @@
 #include "exp/exp_impl.h"
 #include "mdarray/mdarray_impl.h"
 
-namespace KD {
+namespace Autoalg {
 
 template struct Exp<MdarrayImpl>;
 
@@ -94,6 +94,8 @@ class Mdarray : public Exp<MdarrayImpl> {
     return Mdarray{impl_ptr_->Permute(dims)};
   }
 
+  Mdarray Contiguous() const { return Mdarray{impl_ptr_->Contiguous()}; }
+
   Mdarray View(const Shape &shape) const {
     return Mdarray{impl_ptr_->View(shape)};
   }
@@ -136,5 +138,5 @@ class Mdarray : public Exp<MdarrayImpl> {
   }
 };
 
-}  // namespace KD
+}  // namespace Autoalg
 #endif

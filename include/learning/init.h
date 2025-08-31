@@ -8,7 +8,7 @@
 #include "mdarray/mdarray_impl.h"
 #include "utils/exception.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 class InitializerBase {
  public:
@@ -69,5 +69,5 @@ class UniformInitializer : public InitializerBase {
 };
 
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg
 #endif

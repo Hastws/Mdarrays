@@ -47,8 +47,8 @@
 
 ### 构造与索引
 ```cpp
-KD::BasicData data[] = {1,2,3,4,5,6};
-KD::Mdarray x(data, KD::Shape{2,3}, /*requires_grad=*/true);
+Autoalg::BasicData data[] = {1,2,3,4,5,6};
+Autoalg::Mdarray x(data, Autoalg::Shape{2,3}, /*requires_grad=*/true);
 auto v = x[{1,2}];
 ```
 
@@ -62,25 +62,25 @@ auto s  = x.Slice(1, 0, 2);  // 对第1维切片 [0,2)
 
 ### 数值与矩阵算子
 ```cpp
-auto logp = KD::Operator::CreateOperationLogSoftmax(x);
-auto m0   = KD::Operator::CreateOperationMean(x, 0);
-auto mx   = KD::Operator::CreateOperationMax(x, 1);
-auto idx  = KD::Operator::CreateOperationArgmax(x, 1);
+auto logp = Autoalg::Operator::CreateOperationLogSoftmax(x);
+auto m0   = Autoalg::Operator::CreateOperationMean(x, 0);
+auto mx   = Autoalg::Operator::CreateOperationMax(x, 1);
+auto idx  = Autoalg::Operator::CreateOperationArgmax(x, 1);
 
-auto mm   = KD::Operator::CreateOperationMatrixMul(x, xT);
-auto XT   = KD::Operator::CreateOperationMatrixTranspose(x);
+auto mm   = Autoalg::Operator::CreateOperationMatrixMul(x, xT);
+auto XT   = Autoalg::Operator::CreateOperationMatrixTranspose(x);
 ```
 
 ### 训练模块与优化
 ```cpp
-KD::Learning::LinearWithReLU fc(5, 6);
-KD::Learning::CrossEntropy criterion;
-KD::Learning::StochasticGradientDescentWithMomentum optim(
+Autoalg::Learning::LinearWithReLU fc(5, 6);
+Autoalg::Learning::CrossEntropy criterion;
+Autoalg::Learning::StochasticGradientDescentWithMomentum optim(
   fc.Parameters(), /*lr=*/0.01, /*momentum=*/0.9
 );
 
-KD::Mdarray logits = fc.Forward(input);         // input: (N,5)
-KD::Mdarray loss   = criterion.Forward(logits, labels); // labels: N
+Autoalg::Mdarray logits = fc.Forward(input);         // input: (N,5)
+Autoalg::Mdarray loss   = criterion.Forward(logits, labels); // labels: N
 loss.Backward();
 optim.Step();
 optim.ZeroGrad();
@@ -88,10 +88,10 @@ optim.ZeroGrad();
 
 ### 卷积与池化
 ```cpp
-KD::Learning::Conv2dWithReLU conv(2, 3, /*kernel=*/{2,3}, /*stride=*/{2,1}, /*pad=*/{1,0});
-KD::Learning::MaxPool2d pool(/*kernel=*/{3,2}, /*stride=*/{1,2}, /*pad=*/{1,0});
-KD::Mdarray y = conv.Forward(img);  // img: (N,C,H,W)
-KD::Mdarray z = pool.Forward(y);
+Autoalg::Learning::Conv2dWithReLU conv(2, 3, /*kernel=*/{2,3}, /*stride=*/{2,1}, /*pad=*/{1,0});
+Autoalg::Learning::MaxPool2d pool(/*kernel=*/{3,2}, /*stride=*/{1,2}, /*pad=*/{1,0});
+Autoalg::Mdarray y = conv.Forward(img);  // img: (N,C,H,W)
+Autoalg::Mdarray z = pool.Forward(y);
 z.Backward();
 ```
 
@@ -116,7 +116,7 @@ A：查看相应 `CHECK_*` 的提示与 `LOG_MDA_INFO` 输出；重点检查输�
 A：在 `TestLazyEvaluation()` 中注释/启用对应 `Test*` 调用。
 
 **Q：如何自定义初始权重？**  
-A：使用 `KD::Learning::CpyInitializer` 对 `ParamsDict` 中的 `weight/bias` 赋值（见 `TestLinearModule()` / `TestConv2dModule()`）。
+A：使用 `Autoalg::Learning::CpyInitializer` 对 `ParamsDict` 中的 `weight/bias` 赋值（见 `TestLinearModule()` / `TestConv2dModule()`）。
 
 ---
 

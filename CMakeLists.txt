@@ -25,6 +25,7 @@ add_executable(mdarray test/test_base.cpp ${SRC_FILES})
 add_executable(mlp_mnist test/mlp_mnist.cpp ${SRC_FILES})
 add_executable(cnn_mnist test/cnn_mnist.cpp ${SRC_FILES})
 add_executable(cnn_cifar_10 test/cnn_cifar_10.cpp ${SRC_FILES})
+add_executable(transformer_mnist test/transformer_mnist.cpp ${SRC_FILES})
 
 target_compile_definitions(cnn_cifar_10 PRIVATE PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
@@ -34,3 +35,4 @@ target_link_libraries(mdarray multidimensional_arrays_lib memory_pool_lib)
 target_link_libraries(mlp_mnist multidimensional_arrays_lib memory_pool_lib)
 target_link_libraries(cnn_mnist multidimensional_arrays_lib memory_pool_lib)
 target_link_libraries(cnn_cifar_10 multidimensional_arrays_lib memory_pool_lib)
+target_link_libraries(transformer_mnist multidimensional_arrays_lib memory_pool_lib)

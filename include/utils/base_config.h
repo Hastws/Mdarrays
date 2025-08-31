@@ -3,7 +3,7 @@
 
 #include <limits>
 
-namespace KD {
+namespace Autoalg {
 
 using Index = unsigned int;
 using BasicData = double;
@@ -21,5 +21,5 @@ constexpr BasicData DATA_MIN = std::numeric_limits<BasicData>::lowest();
 
 constexpr BasicData EPS = 1e-12;
 
-}  // namespace KD
+}  // namespace Autoalg
 #endif

@@ -3,7 +3,7 @@
 #include <cstring>
 #include <sstream>
 
-namespace KD {
+namespace Autoalg {
 
 char Error::msg_[1024] = {0};
 
@@ -21,4 +21,4 @@ const char *Error::what() const noexcept {
   return msg_;
 }
 
-}  // namespace KD
+}  // namespace Autoalg

@@ -9,7 +9,7 @@
 #include <memory>
 #include <utility>
 
-namespace KD {
+namespace Autoalg {
 namespace Allocator {
 using MemorySize = std::uint64_t;
 struct AllocatorInterface {
@@ -58,6 +58,6 @@ static UniquePtr<T> UniqueConstruct(Args &&...args) {
   return UniquePtr<T>(static_cast<T *>(raw_ptr), DeleteHandler<T>());
 }
 }  // namespace Allocator
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

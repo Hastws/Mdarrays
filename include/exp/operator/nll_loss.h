@@ -3,7 +3,7 @@
 
 #include "utils/base_config.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Operator {
 struct NLLLoss {
   template <typename OperandType>
@@ -45,6 +45,6 @@ struct NLLLoss {
 };
 
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

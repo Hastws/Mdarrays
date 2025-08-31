@@ -4,7 +4,7 @@
 #include "exp/exp_impl.h"
 #include "exp/operator/basic_op.h"
 
-namespace KD {
+namespace Autoalg {
 template <typename ImplType>
 struct Exp {
  public:
@@ -65,6 +65,6 @@ using Operator::operator+;
 using Operator::operator*;
 using Operator::operator-;
 
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

@@ -17,7 +17,7 @@
 #include "memory_pool/allocator.h"
 #include "utils/exception.h"
 
-namespace KD {
+namespace Autoalg {
 
 template <typename ImplType>
 struct Exp;
@@ -427,7 +427,7 @@ Exp<UnaryExpImpl<NLLLoss, OIType>> CreateOperationNllLoss(
   Index n_batch = operand.Impl().Size(0);
   Index n_cls = operand.Impl().Size(1);
   CHECK_TRUE(
-      n_label == KD::Index(-1) || n_label == n_batch,
+      n_label == Autoalg::Index(-1) || n_label == n_batch,
       "Batch Size mismatch, x: " << n_batch << ", labels: " << n_label << ".");
 
   auto labels = labels_ptr.get();
@@ -451,7 +451,7 @@ Exp<UnaryExpImpl<NLLLoss, OIType>> CreateOperationNllLoss(
   Index n_batch = operand.Impl().Size(0);
 #ifndef NDEBUG
   Index n_cls = operand.Impl().Size(1);
-  CHECK_TRUE(n_label == KD::Index(-1) || n_label == n_batch,
+  CHECK_TRUE(n_label == Autoalg::Index(-1) || n_label == n_batch,
              "Batch Size mismatch, x: " << n_batch << ", labels: " << n_label);
 
   for (Index i = 0; i < n_batch; ++i)
@@ -523,6 +523,6 @@ Exp<UnaryExpImpl<MaxPool2d, OIType>> CreateOperationMaxPool2d(
           operand.ImplPtr(), kernel_size, stride_size, padding_size));
 }
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 
 #endif

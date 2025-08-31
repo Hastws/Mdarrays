@@ -11,7 +11,7 @@
 #include "memory_pool/allocator.h"
 #include "utils/exception.h"
 
-namespace KD {
+namespace Autoalg {
 namespace SourceData {
 unsigned int ReverseInt(int i) {
   unsigned char ch1, ch2, ch3, ch4;
@@ -114,9 +114,9 @@ void MNIST::ReadMnistLabels(const std::string &path) {
   }
 }
 }  // namespace SourceData
-}  // namespace KD
+}  // namespace Autoalg
 
-namespace KD {
+namespace Autoalg {
 namespace SourceData {
 Cifar10::Cifar10(const std::string &dataset_dir, bool train, Index batch_size)
     : batch_size_(batch_size) {
@@ -193,4 +193,4 @@ void Cifar10::ReadBin(const std::string &bin_path) {
   }
 }
 }  // namespace SourceData
-}  // namespace KD
+}  // namespace Autoalg

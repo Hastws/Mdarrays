@@ -8,7 +8,7 @@
 #include "utils/base_config.h"
 #include "utils/log.h"
 
-namespace KD {
+namespace Autoalg {
 
 class StorageUniversalAgent;
 
@@ -67,5 +67,5 @@ class StorageUniversalAgent {
   const Storage &storage_;
 };
 
-}  // namespace KD
+}  // namespace Autoalg
 #endif

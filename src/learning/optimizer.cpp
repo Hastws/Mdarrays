@@ -5,7 +5,7 @@
 #include "mdarray/mdarray_impl.h"
 #include "mdarray/storage.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 
 OptimizerBase::OptimizerBase(const ParamsDict &params_dict) {
@@ -87,4 +87,4 @@ void StochasticGradientDescentWithMomentum::Step() {
 }
 
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg

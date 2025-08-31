@@ -7,7 +7,7 @@
 
 #include "utils/base_config.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Operator {
 
 // 与 LogSoftmax 保持同样的 2D 约定：输入形状 (batch, classes)
@@ -95,5 +95,5 @@ struct Softmax {
 };
 
 }  // namespace Operator
-}  // namespace KD
+}  // namespace Autoalg
 #endif

@@ -9,7 +9,7 @@
 
 #include "mdarray/mdarray.h"
 
-namespace KD {
+namespace Autoalg {
 namespace Learning {
 class ParamsDict
     : public std::unordered_map<std::string, std::reference_wrapper<Mdarray>> {
@@ -135,5 +135,5 @@ class CrossEntropy {
 };
 
 }  // namespace Learning
-}  // namespace KD
+}  // namespace Autoalg
 #endif
