@@ -12,6 +12,7 @@ namespace Autoalg {
 namespace Learning {
 class InitializerBase {
  public:
+  virtual ~InitializerBase() = default;
   explicit InitializerBase(Mdarray &param)
       : param_(const_cast<MdarrayImpl &>(param.Impl())) {
     CHECK_TRUE(param_.IsContiguous(),
